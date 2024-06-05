@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native'
 import Checkbox from 'expo-checkbox'
 import axios from 'axios'
 
@@ -152,7 +158,7 @@ const ProgressScreen = ({ navigation, route }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -197,7 +203,7 @@ const ProgressScreen = ({ navigation, route }) => {
           </View>
         ))}
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 

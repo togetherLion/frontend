@@ -1,9 +1,15 @@
 import React from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native'
 
 const CompleteIdScreen = ({ navigation, route }) => {
   return (
-    <View style={styles.completeId}>
+    <SafeAreaView style={styles.completeId}>
       <View style={styles.completeIdHeader}>
         <TouchableOpacity
           onPress={() => navigation.navigate('Login')}
@@ -34,7 +40,7 @@ const CompleteIdScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 

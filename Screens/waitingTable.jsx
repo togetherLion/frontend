@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
+  SafeAreaView,
   View,
   Text,
   ScrollView,
@@ -73,7 +74,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() =>
@@ -145,7 +146,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
             </View>
           ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }
 

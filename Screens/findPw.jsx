@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {
+  SafeAreaView,
   View,
   Text,
   TextInput,
@@ -33,7 +34,7 @@ const FindPwScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.findPw}>
+    <SafeAreaView style={styles.findPw}>
       <View style={styles.findPwHeader}>
         <TouchableOpacity
           onPress={() => navigation.navigate('Login')}
@@ -60,7 +61,7 @@ const FindPwScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 

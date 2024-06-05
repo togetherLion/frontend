@@ -10,8 +10,8 @@ import {
   TouchableOpacity,
   Modal,
   Image,
+  Linking,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import WebSocketManager from '../WebSocketManager'
 import {
   useWebSocketState,
@@ -19,6 +19,7 @@ import {
 } from '../context/WebSocketContext'
 import { useMessageState, useMessageDispatch } from '../context/MessageContext'
 import axios from 'axios'
+import Checkbox from 'expo-checkbox'
 
 const ChatRoomScreen = ({ navigation, route }) => {
   const userId = route.params.userId
@@ -28,6 +29,11 @@ const ChatRoomScreen = ({ navigation, route }) => {
   const [inputMessage, setInputMessage] = useState('')
   const [modalVisible, setModalVisible] = useState(false)
 
+  const [recommendations, setRecommendations] = useState([])
+  const [selected, setSelected] = useState(null)
+  const [recModalVisible, setRecModalVisible] = useState(false)
+  const [recSubModalVisible, setRecSubModalVisible] = useState(false)
+
   const { connected } = useWebSocketState()
   const websocketDispatch = useWebSocketDispatch()
 
@@ -36,7 +42,9 @@ const ChatRoomScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const initialize = async () => {
+      await getAccount()
       await getNickname()
+      await getRecommend()
 
       if (!connected) {
         websocketDispatch({
@@ -118,19 +126,59 @@ const ChatRoomScreen = ({ navigation, route }) => {
   }
 
   const sendAccount = () => {
-    console.log('start sendAccount')
-    getAccount()
-
     const message = {
       type: 'TALK',
       roomId: route.params.roomId,
       sender: nickname,
-      message: cheatMsg + ' ' + account,
+      message: `${cheatMsg}\n계좌 : ${account}`,
     }
     websocketDispatch({ type: 'SEND', payload: message })
     setInputMessage('')
 
-    console.log('end sendAccount')
+    setModalVisible(false)
+  }
+
+  const getRecommend = async () => {
+    try {
+      const response = await axios.get(
+        'http://192.168.200.142:8080/chat/recommend?postId=1' /*+
+          route.params.postId */
+      )
+      setRecommendations(response.data)
+    } catch (error) {
+      console.error('Error getRecommend:', error)
+    }
+  }
+
+  const handleCheckboxClick = (index) => {
+    setSelected(index)
+    setRecSubModalVisible(true)
+  }
+
+  const sendRecommend = () => {
+    if (selected !== null) {
+      const selectedItem = recommendations[selected]
+      const message = {
+        type: 'TALK',
+        roomId: route.params.roomId,
+        sender: nickname,
+        message: `${selectedItem.placeName}\nhttps://www.google.com/maps/search/?api=1&query=${selectedItem.placeLat},${selectedItem.placeLong}`,
+      }
+      websocketDispatch({ type: 'SEND', payload: message })
+    }
+    setModalVisible(false)
+    setRecModalVisible(false)
+    setRecSubModalVisible(false)
+  }
+
+  const handleCancel = () => {
+    setSelected(null)
+    setRecSubModalVisible(false)
+  }
+
+  const handleViewLocation = (latitude, longitude) => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
+    Linking.openURL(url).catch((err) => console.error('An error occurred', err))
   }
 
   return (
@@ -207,12 +255,18 @@ const ChatRoomScreen = ({ navigation, route }) => {
                     }}
                   >
                     <Image
-                      source={require('../assets/images/Icon/check.png')}
+                      source={require('../assets/images/Icon/manage.png')}
                       style={styles.modalIcon}
                     />
                     <Text>진행 상황 관리</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.modalItem}>
+                  <TouchableOpacity
+                    style={styles.modalItem}
+                    onPress={() => {
+                      setModalVisible(false)
+                      setRecModalVisible(true)
+                    }}
+                  >
                     <Image
                       source={require('../assets/images/Icon/location.png')}
                       style={styles.modalIcon}
@@ -239,6 +293,55 @@ const ChatRoomScreen = ({ navigation, route }) => {
             </View>
           </View>
         </View>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={recModalVisible}
+        onRequestClose={() => setRecModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>거래 장소 추천</Text>
+            {recommendations.map((item, index) => (
+              <View key={index} style={styles.item}>
+                <Checkbox
+                  value={selected === index}
+                  onValueChange={() => handleCheckboxClick(index)}
+                />
+                <Text style={styles.itemText}> {item.placeName}</Text>
+                <TouchableOpacity
+                  style={styles.viewLocationButton}
+                  onPress={() =>
+                    handleViewLocation(item.placeLat, item.placeLong)
+                  }
+                >
+                  <Text style={styles.viewLocationText}>위치 보기</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={recSubModalVisible}
+          onRequestClose={handleCancel}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>이 장소로 하시겠습니까?</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button} onPress={sendRecommend}>
+                  <Text style={styles.buttonText}>확인</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={handleCancel}>
+                  <Text style={styles.buttonText}>취소</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </Modal>
       <View style={styles.inputRow}>
         <TouchableOpacity
@@ -369,6 +472,62 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 10,
     backgroundColor: '#fff',
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  itemText: {
+    flex: 1,
+    fontSize: 16,
+  },
+  viewLocationButton: {
+    padding: 10,
+    backgroundColor: '#007bff',
+    borderRadius: 5,
+  },
+  viewLocationText: {
+    color: '#fff',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  button: {
+    flex: 1,
+    marginHorizontal: 10,
+    padding: 10,
+    backgroundColor: '#007bff',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
   },
 })
 

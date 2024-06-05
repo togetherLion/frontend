@@ -1,9 +1,15 @@
 import React from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native'
 
 const CompletePwScreen = ({ navigation }) => {
   return (
-    <View style={styles.completePw}>
+    <SafeAreaView style={styles.completePw}>
       <View style={styles.completePwHeader}>
         <TouchableOpacity
           onPress={() => navigation.navigate('Login')}
@@ -32,7 +38,7 @@ const CompletePwScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
