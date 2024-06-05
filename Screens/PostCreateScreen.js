@@ -1,41 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, ImageBackground, View, StyleSheet, Platform, Text, TextInput, ScrollView, Alert, KeyboardAvoidingView, Button, Modal } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import React, { useState, useEffect } from 'react'
+import {
+  TouchableOpacity,
+  ImageBackground,
+  View,
+  StyleSheet,
+  Platform,
+  Text,
+  TextInput,
+  ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  Button,
+  Modal,
+} from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
 //import Icon from 'react-native-vector-icons/FontAwesome';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import axios from 'axios';
-import * as FileSystem from 'expo-file-system';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import DateTimePicker from '@react-native-community/datetimepicker'
+import axios from 'axios'
+import * as FileSystem from 'expo-file-system'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
-
-const SERVER_URL = 'http://192.168.200.116:8080/posts';
+const SERVER_URL = 'http://192.168.200.142:8080/posts'
 
 const PostCreateScreen = ({ navigation }) => {
-  const [photo, setPhoto] = useState(null);
-  const [productName, setProductName] = useState('');
-  const [price, setPrice] = useState('');
-  const [productContent, setProductContent] = useState('');
-  const [dealNum, setDealNum] = useState('');
-  const [deadlineDate, setDeadlineDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedButton, setSelectedButton] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-
-
+  const [photo, setPhoto] = useState(null)
+  const [productName, setProductName] = useState('')
+  const [price, setPrice] = useState('')
+  const [productContent, setProductContent] = useState('')
+  const [dealNum, setDealNum] = useState('')
+  const [deadlineDate, setDeadlineDate] = useState(new Date())
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [selectedButton, setSelectedButton] = useState(null)
+  const [selectedStatus, setSelectedStatus] = useState(null)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync()
         if (status !== 'granted') {
-          alert('죄송합니다. 이 기능을 사용하려면 카메라 롤 권한이 필요합니다!');
+          alert('죄송합니다. 이 기능을 사용하려면 카메라 롤 권한이 필요합니다!')
         }
       }
-    })();
-  }, []);
+    })()
+  }, [])
 
   const selectPhoto = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -43,100 +54,105 @@ const PostCreateScreen = ({ navigation }) => {
       allowsEditing: false,
       aspect: [4, 3],
       quality: 1,
-    });
+    })
 
     if (!result.cancelled && result.assets && result.assets.length > 0) {
-      const base64Image = await convertToBase64(result.assets[0].uri);
-      setPhoto(`data:image/jpeg;base64,${base64Image}`);
+      const base64Image = await convertToBase64(result.assets[0].uri)
+      setPhoto(`data:image/jpeg;base64,${base64Image}`)
     }
-  };
+  }
 
   const convertToBase64 = async (uri) => {
     try {
       const base64Image = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
-      });
-      return base64Image;
+      })
+      return base64Image
     } catch (error) {
-      console.error("Error converting image to Base64:", error);
-      throw error;
+      console.error('Error converting image to Base64:', error)
+      throw error
     }
-  };
+  }
 
   const statusMapping = {
-    "모집중": "FIRST",
-    "입금 대기중": "SECOND",
-    "상품 배송중": "THIRD",
-    "상품 전달 대기": "FOURTH",
-    "거래 완료": "FIFTH"
-  };
+    모집중: 'FIRST',
+    '입금 대기중': 'SECOND',
+    '상품 배송중': 'THIRD',
+    '상품 전달 대기': 'FOURTH',
+    '거래 완료': 'FIFTH',
+  }
 
   const handleButtonPress = (status) => {
-    setSelectedButton(status);
-  };
+    setSelectedButton(status)
+  }
 
   const formatPrice = (price) => {
-    return price.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  };
+    return price.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  }
 
   const handlePriceChange = (text) => {
-    const numericValue = text.replace(/[^0-9]/g, '');
-    const formattedValue = formatPrice(numericValue);
-    setPrice(formattedValue);
-  };
+    const numericValue = text.replace(/[^0-9]/g, '')
+    const formattedValue = formatPrice(numericValue)
+    setPrice(formattedValue)
+  }
 
   const removeCommas = (price) => {
-    return price.replace(/,/g, '');
-  };
-
-
+    return price.replace(/,/g, '')
+  }
 
   const handleSubmit = async () => {
-    if (!productName || !price || !productContent || !dealNum || !deadlineDate || !photo || !selectedStatus) {
-      setModalMessage('빈칸 없이 모두 입력해 주세요.');
-      setModalVisible(true);
-      return;
+    if (
+      !productName ||
+      !price ||
+      !productContent ||
+      !dealNum ||
+      !deadlineDate ||
+      !photo ||
+      !selectedStatus
+    ) {
+      setModalMessage('빈칸 없이 모두 입력해 주세요.')
+      setModalVisible(true)
+      return
+    } else {
+      axios
+        .post('http://192.168.200.142:8080/user/signup', {
+          productName: productName,
+          productContent: productContent,
+          dealNum: dealNum,
+          deadlineDate: deadlineDate,
+          dealState: statusMapping[selectedStatus],
+          price: removeCommas(price), //앞에서 phone이랑 userAddress받아오기
+          postPicture: photo,
+        })
+        .then(function (response) {
+          console.log(response.data) // 서버에서 받은 응답을 콘솔에 출력합니다.
+          if (response.data.loginId == loginId) {
+            setModalMessage('회원가입이 완료되었습니다.')
+            setModalVisible(true)
+            navigation.navigate('Login')
+          } else {
+            setModalMessage('회원가입에 실패했습니다.')
+            setModalVisible(true)
+          }
+        })
     }
-
-    else {
-      axios.post("http://192.168.200.116:8080/user/signup", {
-        productName: productName,
-        productContent: productContent,
-        dealNum: dealNum,
-        deadlineDate: deadlineDate,
-        dealState: statusMapping[selectedStatus],
-        price: removeCommas(price), //앞에서 phone이랑 userAddress받아오기
-        postPicture: photo,
-      }).then(function (response) {
-        console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
-        if (response.data.loginId == loginId) {
-          setModalMessage('회원가입이 완료되었습니다.');
-          setModalVisible(true);
-          navigation.navigate('Login');
-        } else {
-          setModalMessage('회원가입에 실패했습니다.');
-          setModalVisible(true);
-        }
-      });
-
-    }
-
-
-
-  };
+  }
 
   const handleDatePress = () => {
-    setShowDatePicker(true);
-  };
+    setShowDatePicker(true)
+  }
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
             <Ionicons name="chevron-back" size={30} color="black" />
           </TouchableOpacity>
           <Text style={styles.header}>게시글 작성</Text>
@@ -158,7 +174,6 @@ const PostCreateScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-
         <Text style={styles.label}>제목</Text>
         <TextInput
           style={styles.input}
@@ -167,15 +182,20 @@ const PostCreateScreen = ({ navigation }) => {
           onChangeText={setProductName}
         />
 
-
         <Text style={styles.label}>진행상황</Text>
         <ScrollView horizontal={true} style={styles.scrollView}>
-          {["모집중", "입금 대기중", "상품 배송중", "상품 전달 대기", "거래 완료"].map((status) => (
+          {[
+            '모집중',
+            '입금 대기중',
+            '상품 배송중',
+            '상품 전달 대기',
+            '거래 완료',
+          ].map((status) => (
             <TouchableOpacity
               key={status}
               style={[
                 styles.button,
-                selectedButton === status && styles.selectedButton
+                selectedButton === status && styles.selectedButton,
               ]}
               onPress={() => handleButtonPress(status)}
             >
@@ -183,7 +203,6 @@ const PostCreateScreen = ({ navigation }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-
 
         <Text style={styles.label}>가격</Text>
         <TextInput
@@ -241,8 +260,6 @@ const PostCreateScreen = ({ navigation }) => {
           </View>
         </Modal>
 
-
-
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>등록하기</Text>
         </TouchableOpacity>
@@ -252,17 +269,17 @@ const PostCreateScreen = ({ navigation }) => {
             mode="date"
             display="spinner"
             onChange={(event, date) => {
-              setShowDatePicker(false);
+              setShowDatePicker(false)
               if (date !== undefined) {
-                setDeadlineDate(date);
+                setDeadlineDate(date)
               }
             }}
           />
         )}
       </ScrollView>
     </KeyboardAvoidingView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -292,7 +309,6 @@ const styles = StyleSheet.create({
     borderRadius: 10, // 모서리를 둥글게
     borderColor: '#ddd',
     borderWidth: 1.5, // 테두리 두께
-
   },
   image: {
     width: '100%',
@@ -366,7 +382,7 @@ const styles = StyleSheet.create({
     width: '100%', // 컨테이너 너비를 전체로 설정
     marginTop: 10, // 패딩 추가
   },
-  
+
   okbutton: {
     width: '100%',
     backgroundColor: '#ffcc80',
@@ -401,8 +417,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
   },
+})
 
-  
-});
-
-export default PostCreateScreen;
+export default PostCreateScreen

@@ -1,34 +1,46 @@
-import React, { useState } from 'react';
-import { Alert, TextInput, StyleSheet, View, Text, TouchableOpacity, Modal } from 'react-native';
-import axios from 'axios';
+import React, { useState } from 'react'
+import {
+  Alert,
+  TextInput,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+} from 'react-native'
+import axios from 'axios'
 
 const Complain = ({ navigation, route }) => {
-  const [nowPassword, setNowPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
+  const [nowPassword, setNowPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
 
   const handleSubmit = () => {
     if (newPassword !== confirmPassword) {
-      setModalMessage('비밀번호 확인이 일치하지 않습니다.');
-      setModalVisible(true);
+      setModalMessage('비밀번호 확인이 일치하지 않습니다.')
+      setModalVisible(true)
     } else {
-      axios.post("http://192.168.200.116:8080/user/changePw", { nowPassword: nowPassword, newPassword: newPassword })
+      axios
+        .post('http://192.168.200.142:8080/user/changePw', {
+          nowPassword: nowPassword,
+          newPassword: newPassword,
+        })
         .then((resp) => {
-          console.log(resp.data);
-          if (resp.data !== null && resp.data !== "") {
-            setModalMessage('비밀번호 변경 성공');
-            setModalVisible(true);
+          console.log(resp.data)
+          if (resp.data !== null && resp.data !== '') {
+            setModalMessage('비밀번호 변경 성공')
+            setModalVisible(true)
           }
         })
-        .catch(error => {
-          console.log(error.response.data.error);
-          setModalMessage(error.response.data.error);
-          setModalVisible(true);
-        });
+        .catch((error) => {
+          console.log(error.response.data.error)
+          setModalMessage(error.response.data.error)
+          setModalVisible(true)
+        })
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -44,7 +56,7 @@ const Complain = ({ navigation, route }) => {
           style={styles.input}
           placeholder="현재 비밀번호"
           secureTextEntry={true}
-          onChangeText={text => setNowPassword(text)}
+          onChangeText={(text) => setNowPassword(text)}
           value={nowPassword}
         />
       </View>
@@ -53,7 +65,7 @@ const Complain = ({ navigation, route }) => {
           style={styles.input}
           placeholder="변경할 비밀번호"
           secureTextEntry={true}
-          onChangeText={text => setNewPassword(text)}
+          onChangeText={(text) => setNewPassword(text)}
           value={newPassword}
         />
       </View>
@@ -62,7 +74,7 @@ const Complain = ({ navigation, route }) => {
           style={styles.input}
           placeholder="비밀번호 확인"
           secureTextEntry={true}
-          onChangeText={text => setConfirmPassword(text)}
+          onChangeText={(text) => setConfirmPassword(text)}
           value={confirmPassword}
         />
       </View>
@@ -71,9 +83,9 @@ const Complain = ({ navigation, route }) => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          setModalVisible(false);
+          setModalVisible(false)
           if (modalMessage === '비밀번호 변경 성공') {
-            navigation.navigate('MyPage');
+            navigation.navigate('MyPage')
           }
         }}
       >
@@ -83,9 +95,9 @@ const Complain = ({ navigation, route }) => {
             <TouchableOpacity
               style={[styles.button, styles.closeButton]}
               onPress={() => {
-                setModalVisible(false);
+                setModalVisible(false)
                 if (modalMessage === '비밀번호 변경 성공') {
-                  navigation.navigate('MyPage');
+                  navigation.navigate('MyPage')
                 }
               }}
             >
@@ -99,8 +111,8 @@ const Complain = ({ navigation, route }) => {
         <Text style={styles.buttonText}>비밀번호 변경</Text>
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -203,6 +215,6 @@ const styles = StyleSheet.create({
     height: 20,
     marginTop: 10,
   },
-});
+})
 
-export default Complain;
+export default Complain

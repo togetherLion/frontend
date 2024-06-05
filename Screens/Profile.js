@@ -1,53 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { Avatar, Button } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+} from 'react-native'
+import { Avatar, Button } from 'react-native-elements'
+import Icon from 'react-native-vector-icons/FontAwesome'
+import axios from 'axios'
+import { Ionicons } from '@expo/vector-icons'
 
 const reviews = [
   { id: 1, text: '안녕하세요반갑습니다기및', rating: 5 },
   { id: 2, text: '매우 친절하과 완전 짱입낟. 다음에 또 하고싶어요', rating: 4 },
   { id: 3, text: 'Would like to use it again.', rating: 1 },
   // 여기에 더 많은 리뷰를 추가할 수 있습니다.
-];
+]
 
 const Profile = ({ navigation, route }) => {
-  const [isMyProfile, setIsMyProfile] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [nickname, setNickname] = useState('');
-  const [profileIntro, setProfileIntro] = useState('');
-  const [followerCount, setFollowerCount] = useState('');
-  const [followingCount, setFollowingCount] = useState('');
-  const [townName, setTownName] = useState('');
-  const [complainCount, setComplainCount] = useState('');
-  const [profilePicture, setProfilePicture] = useState('default_image_url');
-  const [loading, setLoading] = useState(true); // 로딩 상태 추가
-  const [forceRender, setForceRender] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-  const [modalType, setModalType] = useState('');
-  const [userId, setUserId] = useState(route.params?.userId || '');
-
-
-
-
-
-
+  const [isMyProfile, setIsMyProfile] = useState(false)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [nickname, setNickname] = useState('')
+  const [profileIntro, setProfileIntro] = useState('')
+  const [followerCount, setFollowerCount] = useState('')
+  const [followingCount, setFollowingCount] = useState('')
+  const [townName, setTownName] = useState('')
+  const [complainCount, setComplainCount] = useState('')
+  const [profilePicture, setProfilePicture] = useState('default_image_url')
+  const [loading, setLoading] = useState(true) // 로딩 상태 추가
+  const [forceRender, setForceRender] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
+  const [modalType, setModalType] = useState('')
+  const [userId, setUserId] = useState(route.params?.userId || '')
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      getProfile();
-    });
-    return unsubscribe;
-  }, [navigation, forceRender]);
+      getProfile()
+    })
+    return unsubscribe
+  }, [navigation, forceRender])
 
   async function getProfile() {
     try {
-      const resp = await axios.post("http://192.168.200.116:8080/user/userProfile", {
-        userId: userId,
-      });
-      if (resp.data !== null && resp.data !== "") {
+      const resp = await axios.post(
+        'http://192.168.200.142:8080/user/userProfile',
+        {
+          userId: userId,
+        }
+      )
+      if (resp.data !== null && resp.data !== '') {
         //console.log(resp.data.complainCount);
         setNickname(resp.data.nickname)
         setProfileIntro(resp.data.profileIntro)
@@ -58,79 +62,79 @@ const Profile = ({ navigation, route }) => {
         setIsFollowing(resp.data.following)
         setIsMyProfile(resp.data.myProfile)
         setComplainCount(resp.data.complainCount)
-        setForceRender(prev => !prev);
+        setForceRender((prev) => !prev)
       } else {
-        console.log("정보 가져오기 실패");
+        console.log('정보 가져오기 실패')
       }
     } catch (err) {
-      console.log(`에러 메시지: ${err}`);
+      console.log(`에러 메시지: ${err}`)
     } finally {
-      setLoading(false); // 로딩 상태 갱신
+      setLoading(false) // 로딩 상태 갱신
     }
   }
 
-
   const confirmAction = () => {
     if (modalType === 'follow') {
-      confirmFollow();
+      confirmFollow()
     } else if (modalType === 'unfollow') {
-      confirmUnfollow();
+      confirmUnfollow()
     } else if (modalType === 'complain') {
-      setModalVisible(false);
-      navigation.navigate('Complain');
+      setModalVisible(false)
+      navigation.navigate('Complain')
     }
-  };
-
+  }
 
   const confirmFollow = () => {
-    axios.post("http://192.168.200.116:8080/follow", { userId: userId })
+    axios
+      .post('http://192.168.200.142:8080/follow', { userId: userId })
       .then((resp) => {
-        console.log(resp.data);
-        if (resp.data !== null && resp.data !== "") {
-          setModalVisible(false);
-          getProfile();
+        console.log(resp.data)
+        if (resp.data !== null && resp.data !== '') {
+          setModalVisible(false)
+          getProfile()
         }
       })
       .catch((error) => {
-        console.error(error);
-        Alert.alert('Logout Failed', '로그아웃에 실패했습니다.');
-        setModalVisible(false);
-      });
-  };
+        console.error(error)
+        Alert.alert('Logout Failed', '로그아웃에 실패했습니다.')
+        setModalVisible(false)
+      })
+  }
 
   const confirmUnfollow = () => {
-    axios.post("http://192.168.200.116:8080/follow/unfollow", { userId: userId })
+    axios
+      .post('http://192.168.200.142:8080/follow/unfollow', { userId: userId })
       .then((resp) => {
-        console.log(resp.data);
-        if (resp.data !== null && resp.data !== "") {
-          setModalVisible(false);
-          getProfile();
+        console.log(resp.data)
+        if (resp.data !== null && resp.data !== '') {
+          setModalVisible(false)
+          getProfile()
         }
       })
       .catch((error) => {
-        console.error(error);
-        Alert.alert('Logout Failed', '로그아웃에 실패했습니다.');
-        setModalVisible(false);
-      });
-  };
+        console.error(error)
+        Alert.alert('Logout Failed', '로그아웃에 실패했습니다.')
+        setModalVisible(false)
+      })
+  }
 
   const handleFollow = () => {
-    setModalType('follow');
-    setModalMessage('팔로우 하시겠습니까?');
-    setModalVisible(true);
-  };
+    setModalType('follow')
+    setModalMessage('팔로우 하시겠습니까?')
+    setModalVisible(true)
+  }
 
   const handleUnfollow = () => {
-    setModalType('unfollow');
-    setModalMessage('언팔로우 하시겠습니까?');
-    setModalVisible(true);
-  };
+    setModalType('unfollow')
+    setModalMessage('언팔로우 하시겠습니까?')
+    setModalVisible(true)
+  }
 
   const handleComplain = () => {
-    setModalType('complain');
-    setModalMessage('신고 하시겠습니까?');
-    setModalVisible(true);
-  };
+    setModalType('complain')
+    setModalMessage('신고 하시겠습니까?')
+    setModalVisible(true)
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -148,14 +152,15 @@ const Profile = ({ navigation, route }) => {
                 title="내 프로필 수정"
                 buttonStyle={styles.followButton}
                 titleStyle={styles.buttonText}
-                onPress={() => navigation.navigate('EditProfile', {
-                  nickname: nickname,
-                  profileIntro: profileIntro,
-                  profilePicture: profilePicture
-                })}
+                onPress={() =>
+                  navigation.navigate('EditProfile', {
+                    nickname: nickname,
+                    profileIntro: profileIntro,
+                    profilePicture: profilePicture,
+                  })
+                }
               />
             ) : isFollowing ? (
-
               <Button
                 title="팔로잉"
                 buttonStyle={styles.followButton}
@@ -164,13 +169,7 @@ const Profile = ({ navigation, route }) => {
               />
             ) : (
               <Button
-                icon={
-                  <Icon
-                    name="user-plus"
-                    size={15}
-                    color="black"
-                  />
-                }
+                icon={<Icon name="user-plus" size={15} color="black" />}
                 title=" 팔로우"
                 buttonStyle={styles.followButton}
                 titleStyle={styles.buttonText}
@@ -182,23 +181,34 @@ const Profile = ({ navigation, route }) => {
           <Text style={styles.location}>{townName}</Text>
           <Text style={styles.bio}>{profileIntro}</Text>
           <View style={styles.followInfo}>
-            <TouchableOpacity onPress={() => navigation.navigate('Following', { userId: userId })}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('Following', { userId: userId })
+              }
+            >
               <View style={styles.followWrapper}>
                 <Text style={styles.followLabel}>팔로잉</Text>
-                <Text style={styles.followCount}>   {followingCount}</Text>
+                <Text style={styles.followCount}> {followingCount}</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Follower', { userId: userId })}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('Follower', { userId: userId })
+              }
+            >
               <View style={styles.followWrapper}>
                 <Text style={styles.followLabel}>팔로워</Text>
-                <Text style={styles.followCount}>   {followerCount}</Text>
+                <Text style={styles.followCount}> {followerCount}</Text>
               </View>
             </TouchableOpacity>
           </View>
           <View style={styles.reviewSection}>
             <Text style={styles.reviewTitle}>작성된 후기</Text>
             <Text style={styles.aveTitle}>평점 </Text>
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
               {reviews.map((review) => (
                 <View key={review.id} style={styles.reviewCard}>
                   <View style={styles.ratingContainer}>
@@ -217,7 +227,12 @@ const Profile = ({ navigation, route }) => {
                 <TouchableOpacity onPress={handleComplain}>
                   <Icon name="bell" size={25} color="#ff6666" />
                 </TouchableOpacity>
-                <Text style={[styles.complainText, { color: 'black', marginLeft: 10 }]}>
+                <Text
+                  style={[
+                    styles.complainText,
+                    { color: 'black', marginLeft: 10 },
+                  ]}
+                >
                   해당 사용자는 {complainCount}번의 신고를 받았어요!
                 </Text>
               </View>
@@ -251,10 +266,9 @@ const Profile = ({ navigation, route }) => {
           </View>
         </View>
       </Modal>
-
     </ScrollView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -403,6 +417,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 5, // 버튼 사이 간격 추가
     backgroundColor: '#2196F3',
   },
-});
+})
 
-export default Profile;
+export default Profile

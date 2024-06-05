@@ -1,82 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList, Alert, ScrollView, Modal } from 'react-native';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react'
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  Alert,
+  ScrollView,
+  Modal,
+} from 'react-native'
+import axios from 'axios'
 
 const data1 = [
-  { id: '1', title: '에어팟 맥스 실버', price: '550,000원', image: 'https://example.com/item1.jpg' },
-  { id: '2', title: '닌텐도 스위치', price: '120,000원', image: 'https://example.com/item2.jpg' },
-];
+  {
+    id: '1',
+    title: '에어팟 맥스 실버',
+    price: '550,000원',
+    image: 'https://example.com/item1.jpg',
+  },
+  {
+    id: '2',
+    title: '닌텐도 스위치',
+    price: '120,000원',
+    image: 'https://example.com/item2.jpg',
+  },
+]
 
 const data2 = [
-  { id: '1', title: '에어팟 미개봉', price: '240,000원', image: 'https://example.com/item3.jpg' },
-  { id: '2', title: '닌텐도 스위치', price: '120,000원', image: 'https://example.com/item4.jpg' },
-];
+  {
+    id: '1',
+    title: '에어팟 미개봉',
+    price: '240,000원',
+    image: 'https://example.com/item3.jpg',
+  },
+  {
+    id: '2',
+    title: '닌텐도 스위치',
+    price: '120,000원',
+    image: 'https://example.com/item4.jpg',
+  },
+]
 
 const MyPage = ({ navigation, route }) => {
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-  const [modalType, setModalType] = useState('');
-  const [userId, setUserId] = useState(route.params?.userId || '');
-  const [nickname, setNickname] = useState('');
-  const [townName, setTownName] = useState('');
-  const [profilePicture, setProfilePicture] = useState('default_image_url');
-  const [myPost, setMyPost] = useState([]);
-  const [likedPost, setLikedPost] = useState([]);
-  const [forceRender, setForceRender] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
+  const [modalType, setModalType] = useState('')
+  const [userId, setUserId] = useState(route.params?.userId || '')
+  const [nickname, setNickname] = useState('')
+  const [townName, setTownName] = useState('')
+  const [profilePicture, setProfilePicture] = useState('default_image_url')
+  const [myPost, setMyPost] = useState([])
+  const [likedPost, setLikedPost] = useState([])
+  const [forceRender, setForceRender] = useState(false)
+  const [loading, setLoading] = useState(true)
   //const [userData, setUserData] = useState([]);
-
-
-
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      getMyPage();
-    });
-    return unsubscribe;
-  }, [navigation, forceRender]);
+      getMyPage()
+    })
+    return unsubscribe
+  }, [navigation, forceRender])
 
   async function getMyPage() {
     try {
       const responses = await Promise.all([
-        axios.post("http://192.168.200.116:8080/user/userProfile", { userId: userId }),
-        axios.get("http://192.168.200.116:8080/posts/my"),
-        axios.get("http://192.168.200.116:8080/goods/liked"),
-      ]);
+        axios.post('http://192.168.200.142:8080/user/userProfile', {
+          userId: userId,
+        }),
+        axios.get('http://192.168.200.142:8080/posts/my'),
+        axios.get('http://192.168.200.142:8080/goods/liked'),
+      ])
 
-      const [resp1, resp2, resp3] = responses;
+      const [resp1, resp2, resp3] = responses
 
-
-      if (resp1.data !== null && resp1.data !== "") {
-        setNickname(resp1.data.nickname);
-        setTownName(resp1.data.townName);
-        setProfilePicture(resp1.data.profilePicture);
+      if (resp1.data !== null && resp1.data !== '') {
+        setNickname(resp1.data.nickname)
+        setTownName(resp1.data.townName)
+        setProfilePicture(resp1.data.profilePicture)
         //setForceRender(prev => !prev);
       }
       // Process responses from other servers if needed
       if (resp2.data) {
-        setMyPost(resp2.data);
-        console.log(myPost);
+        setMyPost(resp2.data)
+        console.log(myPost)
       }
 
       if (resp3.data) {
         // Handle response from third server
-        setLikedPost(resp3.data);
+        setLikedPost(resp3.data)
       }
-
     } catch (err) {
-      console.log(`에러 메시지: ${err}`);
+      console.log(`에러 메시지: ${err}`)
     } finally {
-      setLoading(false); // 로딩 상태 갱신
+      setLoading(false) // 로딩 상태 갱신
     }
   }
 
-
   const handleItemPress = (item) => {
-    Alert.alert('Item Pressed', `You pressed item: ${item.title}`);
+    Alert.alert('Item Pressed', `You pressed item: ${item.title}`)
     // 여기에 원하는 동작을 추가하세요. 예: 특정 페이지로 네비게이션
-  };
+  }
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
@@ -84,59 +109,60 @@ const MyPage = ({ navigation, route }) => {
       <Text style={styles.itemTitle}>{item.productName}</Text>
       <Text style={styles.itemPrice}>{item.price}원</Text>
     </TouchableOpacity>
-  );
+  )
 
   const handleLogout = () => {
-    setModalType('logout');
-    setModalMessage('로그아웃 하시겠습니까?');
-    setModalVisible(true);
-  };
+    setModalType('logout')
+    setModalMessage('로그아웃 하시겠습니까?')
+    setModalVisible(true)
+  }
 
   const confirmLogout = () => {
-    axios.post("http://192.168.200.116:8080/user/logout")
+    axios
+      .post('http://192.168.200.142:8080/user/logout')
       .then((resp) => {
-        console.log(resp.data);
-        if (resp.data !== null && resp.data !== "") {
-          setModalVisible(false);
+        console.log(resp.data)
+        if (resp.data !== null && resp.data !== '') {
+          setModalVisible(false)
           navigation.reset({
             index: 0,
             routes: [{ name: 'Login' }],
-          });
+          })
         }
       })
       .catch((error) => {
-        console.error(error);
-        Alert.alert('Logout Failed', '로그아웃에 실패했습니다.');
-        setModalVisible(false);
-      });
-  };
+        console.error(error)
+        Alert.alert('Logout Failed', '로그아웃에 실패했습니다.')
+        setModalVisible(false)
+      })
+  }
 
   const handleWithdraw = () => {
-    setModalType('withdraw');
-    setModalMessage('탈퇴 하시겠습니까?');
-    setModalVisible(true);
-  };
+    setModalType('withdraw')
+    setModalMessage('탈퇴 하시겠습니까?')
+    setModalVisible(true)
+  }
 
   const handleEditPass = () => {
-    setModalType('EditPass');
-    setModalMessage('비밀번호를 변경하시겠습니까?');
-    setModalVisible(true);
-  };
+    setModalType('EditPass')
+    setModalMessage('비밀번호를 변경하시겠습니까?')
+    setModalVisible(true)
+  }
 
   const confirmAction = () => {
     if (modalType === 'logout') {
-      confirmLogout();
+      confirmLogout()
     } else if (modalType === 'withdraw') {
-      setModalVisible(false);
-      navigation.navigate('Withdraw');
+      setModalVisible(false)
+      navigation.navigate('Withdraw')
     } else if (modalType === 'EditPass') {
-      setModalVisible(false);
-      navigation.navigate('EditPassword');
+      setModalVisible(false)
+      navigation.navigate('EditPassword')
     }
-  };
+  }
 
   if (loading) {
-    return null; // 로딩 중일 때는 화면에 아무것도 렌더링하지 않음
+    return null // 로딩 중일 때는 화면에 아무것도 렌더링하지 않음
   }
 
   return (
@@ -149,7 +175,10 @@ const MyPage = ({ navigation, route }) => {
           source={{ uri: profilePicture }} // 프로필 이미지 URL
         />
         <View style={styles.profileTextContainer}>
-          <Text style={styles.profileName}> {nickname} ({townName})</Text>
+          <Text style={styles.profileName}>
+            {' '}
+            {nickname} ({townName})
+          </Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.editButton}
@@ -166,7 +195,6 @@ const MyPage = ({ navigation, route }) => {
           </View>
         </View>
       </View>
-
 
       <View>
         {myPost && myPost.length > 0 && (
@@ -239,8 +267,8 @@ const MyPage = ({ navigation, route }) => {
         </View>
       </Modal>
     </ScrollView>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -366,8 +394,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 5, // 버튼 사이 간격 추가
     backgroundColor: '#2196F3',
   },
+})
 
-
-});
-
-export default MyPage;
+export default MyPage

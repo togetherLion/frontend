@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import {
   View,
   Text,
@@ -9,20 +9,36 @@ import {
   Alert,
 } from 'react-native'
 import axios from 'axios'
+import { useFocusEffect } from '@react-navigation/native'
 
 const ChatButtonScreen = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [roomName, setRoomName] = useState('')
-  const [chatRoomData, setChatRoomData] = useState([])
-  // const [postId, setRoomId] = useState('')
-  const postId = 1
+  const [chatRoomExists, setChatRoomExists] = useState(false) // State to hold the result of checkChatRoom
   const [chatUserData, setChatUserData] = useState([])
   const userId = route.params.userId
-  // let check = 2
+  const postId = 1
 
-  // useEffect(() => {
-  //   check = checkChatRoom()
-  // }, [])
+  useFocusEffect(
+    useCallback(() => {
+      const checkChatRoom = async () => {
+        try {
+          const response = await axios.get(
+            'http://192.168.200.142:8080/waitingdeal/check-chat-room/1'
+          )
+          if (response.data.roomId) {
+            setChatRoomExists(true)
+          } else {
+            setChatRoomExists(false)
+          }
+        } catch (error) {
+          setChatRoomExists(false)
+        }
+      }
+
+      checkChatRoom()
+    }, [postId])
+  )
 
   const checkCreateChat = async () => {
     try {
@@ -45,28 +61,25 @@ const ChatButtonScreen = ({ navigation, route }) => {
 
   const createChat = async (postId, roomName) => {
     try {
-      const response = await axios
-        .post(
-          'http://192.168.200.142:8080/chat/check-and-create-room?' +
-            'postId=' +
-            postId +
-            '&roomName=' +
-            roomName
-        )
+      const response = await axios.post(
+        'http://192.168.200.142:8080/chat/check-and-create-room?' +
+          'postId=' +
+          postId +
+          '&roomName=' +
+          roomName
+      )
 
-        .then((response) => {
-          navigation.navigate('ChatRoom', {
-            userId: userId,
-            roomId: response.data.roomId,
-            chatUserData: chatUserData,
-          })
-        })
+      navigation.navigate('ChatRoom', {
+        userId: userId,
+        roomId: response.data.roomId,
+        chatUserData: chatUserData,
+      })
     } catch (error) {
       console.error('Error createChat:', error)
     }
   }
 
-  const joinChatRoom = async (postId) => {
+  const joinChatRoom = async () => {
     try {
       const response = await axios.get(
         'http://192.168.200.142:8080/waitingdeal/check-chat-room/1'
@@ -76,31 +89,15 @@ const ChatButtonScreen = ({ navigation, route }) => {
         roomId: response.data.roomId,
       })
     } catch (error) {
-      console.error('Error checkChatRoom:', error)
-    }
-  }
-
-  const checkChatRoom = async (postId) => {
-    try {
-      const response = await axios.get(
-        'http://192.168.200.142:8080/waitingdeal/check-chat-room/1'
-      )
-      console.log(1)
-      return 1
-    } catch (error) {
-      console.log(0)
-      return 0
+      console.error('Error joinChatRoom:', error)
     }
   }
 
   const sendWaiting = async () => {
     try {
-      const response = await axios.post(
-        'http://192.168.200.142:8080/waitingdeal',
-        {
-          postId: 1, // 현재 postId로 바꾸기
-        }
-      )
+      await axios.post('http://192.168.200.142:8080/waitingdeal', {
+        postId: 1, // 현재 postId로 바꾸기
+      })
       Alert.alert('참여가 요청되었습니다!')
     } catch (error) {
       Alert.alert(
@@ -114,11 +111,8 @@ const ChatButtonScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       {userId === 1 /*현재 post의 userId로 바꾸기*/ ? (
         <>
-          {checkChatRoom(postId) === 1 ? (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={joinChatRoom(postId)}
-            >
+          {chatRoomExists ? (
+            <TouchableOpacity style={styles.button} onPress={joinChatRoom}>
               <Text style={styles.buttonText}>채팅방 참가</Text>
             </TouchableOpacity>
           ) : (
@@ -145,10 +139,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
             <Text style={styles.buttonText}>참여하기</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={joinChatRoom(postId)}
-          >
+          <TouchableOpacity style={styles.button} onPress={joinChatRoom}>
             <Text style={styles.buttonText}>채팅방 참가</Text>
           </TouchableOpacity>
         </>

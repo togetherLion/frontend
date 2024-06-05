@@ -20,24 +20,11 @@ import {
 import { useMessageState, useMessageDispatch } from '../context/MessageContext'
 import axios from 'axios'
 
-// const getUserId = async () => {
-//   try {
-//     const userId = await AsyncStorage.getItem('@user_id')
-//     return userId
-//   } catch (error) {
-//     console.error('Failed to fetch the user ID from storage:', error)
-//     return null
-//   }
-// }
-
 const ChatRoomScreen = ({ navigation, route }) => {
-  // const [userId, setUserId] = useState(null)
   const userId = route.params.userId
   const [nickname, setNickname] = useState('')
   const [account, setAccount] = useState('')
   const [cheatMsg, setCheatMsg] = useState('')
-  // const chatUserData = route.params.chatUserData
-
   const [inputMessage, setInputMessage] = useState('')
   const [modalVisible, setModalVisible] = useState(false)
 
@@ -48,20 +35,18 @@ const ChatRoomScreen = ({ navigation, route }) => {
   const messageDispatch = useMessageDispatch()
 
   useEffect(() => {
-    // const fetchUserId = async () => {
-    //   const id = await getUserId()
-    //   setUserId(id)
-    // }
+    const initialize = async () => {
+      await getNickname()
 
-    // fetchUserId()
-    getNickname()
-
-    if (!connected) {
-      websocketDispatch({
-        type: 'CONNECT',
-        payload: 'ws://192.168.200.142:8080/ws/chat',
-      })
+      if (!connected) {
+        websocketDispatch({
+          type: 'CONNECT',
+          payload: 'ws://192.168.200.142:8080/ws/chat',
+        })
+      }
     }
+
+    initialize()
 
     const handleOpen = () => {
       sendEnterMessage()
@@ -82,7 +67,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
       WebSocketManager.off('open', handleOpen)
       WebSocketManager.off('message', handleMessage)
     }
-  }, [connected])
+  }, [connected, nickname]) // Add nickname as a dependency
 
   const getNickname = async () => {
     try {
@@ -93,8 +78,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
       console.log(response.data.nickname)
       setNickname(response.data.nickname)
     } catch (error) {
-      console.error('Error createChat:', error)
-      return null // 에러가 발생하면 null을 반환
+      console.error('Error getting nickname:', error)
     }
   }
 
@@ -106,17 +90,6 @@ const ChatRoomScreen = ({ navigation, route }) => {
       message: '안녕하세요?',
     }
     websocketDispatch({ type: 'SEND', payload: enterMessage })
-
-    // 수락된 사람 전부 ENTER 메시지 보내기
-    // chatUserData.map((user) => {
-    //   const enterMessage = {
-    //     type: 'ENTER',
-    //     roomId: route.params.roomId,
-    //     sender: user.nickname,
-    //     message: '안녕하세요?',
-    //   }
-    //   websocketDispatch({ type: 'SEND', payload: enterMessage })
-    // })
   }
 
   const sendMessage = () => {
@@ -140,7 +113,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
       setCheatMsg(response.data.cheatMsg)
       setAccount(response.data.account)
     } catch (error) {
-      console.error('Error getAccount:', error)
+      console.error('Error getting account:', error)
     }
   }
 
@@ -199,7 +172,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
             <View style={styles.modalContent}>
               <TouchableOpacity style={styles.modalItem}>
                 <Image
-                  source={require('../assets/images/Logo.png')}
+                  source={require('../assets/images/Icon/photo.png')}
                   style={styles.modalIcon}
                 />
                 <Text>사진</Text>
@@ -211,14 +184,14 @@ const ChatRoomScreen = ({ navigation, route }) => {
                     onPress={sendAccount}
                   >
                     <Image
-                      source={require('../assets/images/Logo.png')}
+                      source={require('../assets/images/Icon/account.png')}
                       style={styles.modalIcon}
                     />
                     <Text>계좌 보내기</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.modalItem}>
                     <Image
-                      source={require('../assets/images/Logo.png')}
+                      source={require('../assets/images/Icon/exit.png')}
                       style={styles.modalIcon}
                     />
                     <Text>강퇴</Text>
@@ -234,14 +207,14 @@ const ChatRoomScreen = ({ navigation, route }) => {
                     }}
                   >
                     <Image
-                      source={require('../assets/images/Logo.png')}
+                      source={require('../assets/images/Icon/check.png')}
                       style={styles.modalIcon}
                     />
                     <Text>진행 상황 관리</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.modalItem}>
                     <Image
-                      source={require('../assets/images/Logo.png')}
+                      source={require('../assets/images/Icon/location.png')}
                       style={styles.modalIcon}
                     />
                     <Text>장소 추천</Text>
@@ -250,7 +223,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
               ) : (
                 <TouchableOpacity style={styles.modalItem}>
                   <Image
-                    source={require('../assets/images/Logo.png')}
+                    source={require('../assets/images/Icon/review.png')}
                     style={styles.modalIcon}
                   />
                   <Text>후기 등록</Text>
@@ -258,7 +231,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
               )}
               <TouchableOpacity style={styles.modalItem}>
                 <Image
-                  source={require('../assets/images/Logo.png')}
+                  source={require('../assets/images/Icon/exit-chat.png')}
                   style={styles.modalIcon}
                 />
                 <Text>채팅방 나가기</Text>

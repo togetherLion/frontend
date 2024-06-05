@@ -1,108 +1,122 @@
-import React, { useState } from 'react';
-import { Alert, TextInput, StyleSheet, View, Text, TouchableOpacity, Modal } from 'react-native';
-import axios from 'axios';
+import React, { useState } from 'react'
+import {
+  Alert,
+  TextInput,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+} from 'react-native'
+import axios from 'axios'
 
 const SignupScreen = ({ navigation, route }) => {
-
-  const [phone, setPhone] = useState(route.params?.phone || '');
-  const [userAddress, setUserAddress] = useState(route.params?.userAddress || '');
-  const [userLat, setUserlat] = useState(route.params?.userLat || '');
-  const [userLong, setUserlong] = useState(route.params?.userLong || '');
-  const [loginId, setUserId] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setUserName] = useState('');
-  const [nickName, setNickName] = useState('');
-  const [isIdAvailable, setIsIdAvailable] = useState(null);
-  const [isNicknameAvailable, setIsNicknameAvailable] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-
-
+  const [phone, setPhone] = useState(route.params?.phone || '')
+  const [userAddress, setUserAddress] = useState(
+    route.params?.userAddress || ''
+  )
+  const [userLat, setUserlat] = useState(route.params?.userLat || '')
+  const [userLong, setUserlong] = useState(route.params?.userLong || '')
+  const [loginId, setUserId] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [name, setUserName] = useState('')
+  const [nickName, setNickName] = useState('')
+  const [isIdAvailable, setIsIdAvailable] = useState(null)
+  const [isNicknameAvailable, setIsNicknameAvailable] = useState(null)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
 
   const checkId = () => {
-    if (loginId.trim() === "") {
-      setModalMessage('ID가 입력되지 않았습니다.');
-      setModalVisible(true);
+    if (loginId.trim() === '') {
+      setModalMessage('ID가 입력되지 않았습니다.')
+      setModalVisible(true)
     } else {
-      axios.post("http://192.168.200.116:8080/user/idCheck", {
-        loginId: loginId
-      }).then(function (response) {
-        console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
-        if (response.data.idCheck == true) {
-          setModalMessage('사용 중인 ID입니다. 다른 ID를 시도하세요.');
-          setIsIdAvailable(false);
-          setModalVisible(true);
-        } else {
-          setModalMessage('사용 가능한 ID입니다.');
-          setIsIdAvailable(true);
-          setModalVisible(true);
-        }
-      })
+      axios
+        .post('http://192.168.200.142:8080/user/idCheck', {
+          loginId: loginId,
+        })
+        .then(function (response) {
+          console.log(response.data) // 서버에서 받은 응답을 콘솔에 출력합니다.
+          if (response.data.idCheck == true) {
+            setModalMessage('사용 중인 ID입니다. 다른 ID를 시도하세요.')
+            setIsIdAvailable(false)
+            setModalVisible(true)
+          } else {
+            setModalMessage('사용 가능한 ID입니다.')
+            setIsIdAvailable(true)
+            setModalVisible(true)
+          }
+        })
     }
-  };
+  }
 
   const checkNickname = () => {
-    if (nickName.trim() === "") {
-      setModalMessage('닉네임이 입력되지 않았습니다.');
+    if (nickName.trim() === '') {
+      setModalMessage('닉네임이 입력되지 않았습니다.')
     } else {
-      axios.post("http://192.168.200.116:8080/user/nicknameCheck", {
-        nickname: nickName,
-      }).then(function (response) {
-        console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
-        if (response.data.nicknameCheck == true) {
-          setModalMessage('사용 중인 닉네임입니다. 다른 닉네임 시도하세요.');
-          setIsNicknameAvailable(false);
-        } else {
-          setModalMessage('사용 가능한 닉네임입니다.');
-          setIsNicknameAvailable(true);
-        }
-        setModalVisible(true);
-      })
-    }
-  };
-
-  const handleSubmit = () => { // 회원가입할때
-    if (!isIdAvailable) {
-      setModalMessage('사용할 수 없는 ID입니다.');
-      setModalVisible(true);
-    } else if (password !== confirmPassword) {
-      setModalMessage('비밀번호가 일치하지 않습니다.');
-      setModalVisible(true);
-    } else if (name.trim() === "") { //이름입력x
-      setModalMessage('이름이 입력되지 않았습니다.');
-      setModalVisible(true);
-    } else if (!isNicknameAvailable) {
-      setModalMessage('사용할 수 없는 닉네임입니다.');
-      setModalVisible(true);
-    } else {
-      axios.post("http://192.168.200.116:8080/user/signup", {
-        loginId: loginId,
-        password: password,
-        name: name,
-        nickname: nickName,
-        phone: phone,
-        userAddress: userAddress, //앞에서 phone이랑 userAddress받아오기
-        userLat: userLat,
-        userLong: userLong,
-      }).then(function (response) {
-          console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
-          if (response.data.loginId == loginId) {
-            setModalMessage('회원가입이 완료되었습니다.');
-            setModalVisible(true);
-            navigation.navigate('Login');
+      axios
+        .post('http://192.168.200.142:8080/user/nicknameCheck', {
+          nickname: nickName,
+        })
+        .then(function (response) {
+          console.log(response.data) // 서버에서 받은 응답을 콘솔에 출력합니다.
+          if (response.data.nicknameCheck == true) {
+            setModalMessage('사용 중인 닉네임입니다. 다른 닉네임 시도하세요.')
+            setIsNicknameAvailable(false)
           } else {
-            setModalMessage('회원가입에 실패했습니다.');
-            setModalVisible(true);
+            setModalMessage('사용 가능한 닉네임입니다.')
+            setIsNicknameAvailable(true)
           }
-        });
+          setModalVisible(true)
+        })
     }
-  };
+  }
+
+  const handleSubmit = () => {
+    // 회원가입할때
+    if (!isIdAvailable) {
+      setModalMessage('사용할 수 없는 ID입니다.')
+      setModalVisible(true)
+    } else if (password !== confirmPassword) {
+      setModalMessage('비밀번호가 일치하지 않습니다.')
+      setModalVisible(true)
+    } else if (name.trim() === '') {
+      //이름입력x
+      setModalMessage('이름이 입력되지 않았습니다.')
+      setModalVisible(true)
+    } else if (!isNicknameAvailable) {
+      setModalMessage('사용할 수 없는 닉네임입니다.')
+      setModalVisible(true)
+    } else {
+      axios
+        .post('http://192.168.200.142:8080/user/signup', {
+          loginId: loginId,
+          password: password,
+          name: name,
+          nickname: nickName,
+          phone: phone,
+          userAddress: userAddress, //앞에서 phone이랑 userAddress받아오기
+          userLat: userLat,
+          userLong: userLong,
+        })
+        .then(function (response) {
+          console.log(response.data) // 서버에서 받은 응답을 콘솔에 출력합니다.
+          if (response.data.loginId == loginId) {
+            setModalMessage('회원가입이 완료되었습니다.')
+            setModalVisible(true)
+            navigation.navigate('Login')
+          } else {
+            setModalMessage('회원가입에 실패했습니다.')
+            setModalVisible(true)
+          }
+        })
+    }
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-      </View>
+      <View style={styles.header}></View>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>
           회원 정보를 {'\n'}
@@ -113,7 +127,7 @@ const SignupScreen = ({ navigation, route }) => {
         <TextInput
           style={styles.input}
           placeholder="아이디"
-          onChangeText={text => setUserId(text)}
+          onChangeText={(text) => setUserId(text)}
           value={loginId}
         />
         <TouchableOpacity style={styles.checkButton} onPress={checkId}>
@@ -142,7 +156,7 @@ const SignupScreen = ({ navigation, route }) => {
         <TextInput
           style={styles.input}
           placeholder="비밀번호"
-          onChangeText={text => setPassword(text)}
+          onChangeText={(text) => setPassword(text)}
           secureTextEntry={true}
           value={password}
         />
@@ -151,7 +165,7 @@ const SignupScreen = ({ navigation, route }) => {
         <TextInput
           style={styles.input}
           placeholder="비밀번호 확인"
-          onChangeText={text => setConfirmPassword(text)}
+          onChangeText={(text) => setConfirmPassword(text)}
           secureTextEntry={true}
           value={confirmPassword}
         />
@@ -160,7 +174,7 @@ const SignupScreen = ({ navigation, route }) => {
         <TextInput
           style={styles.input}
           placeholder="이름"
-          onChangeText={text => setUserName(text)}
+          onChangeText={(text) => setUserName(text)}
           value={name}
         />
       </View>
@@ -168,7 +182,7 @@ const SignupScreen = ({ navigation, route }) => {
         <TextInput
           style={styles.input}
           placeholder="닉네임"
-          onChangeText={text => setNickName(text)}
+          onChangeText={(text) => setNickName(text)}
           value={nickName}
         />
         <TouchableOpacity style={styles.checkButton} onPress={checkNickname}>
@@ -181,8 +195,8 @@ const SignupScreen = ({ navigation, route }) => {
         <Text style={styles.buttonText}>회원가입</Text>
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -286,6 +300,6 @@ const styles = StyleSheet.create({
     height: 20,
     marginTop: 10,
   },
-});
+})
 
-export default SignupScreen;
+export default SignupScreen

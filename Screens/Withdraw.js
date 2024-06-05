@@ -1,41 +1,45 @@
-import React, { useState } from 'react';
-import { Alert, TextInput, StyleSheet, View, Text, TouchableOpacity, Modal } from 'react-native';
-import axios from 'axios';
+import React, { useState } from 'react'
+import {
+  Alert,
+  TextInput,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+} from 'react-native'
+import axios from 'axios'
 
 const Withdraw = ({ navigation, route }) => {
-
-  const [password, setPassword] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-  
-
-
+  const [password, setPassword] = useState('')
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalMessage, setModalMessage] = useState('')
 
   const withdraw = () => {
-    axios.delete("http://192.168.200.116:8080/user/unregister", {
-      data: { password: password }
-    })
+    axios
+      .delete('http://192.168.200.142:8080/user/unregister', {
+        data: { password: password },
+      })
       .then((resp) => {
-        console.log(resp.data);
-        if (resp.data !== null && resp.data !== "") {
-          setModalVisible(false);
+        console.log(resp.data)
+        if (resp.data !== null && resp.data !== '') {
+          setModalVisible(false)
           navigation.reset({
             index: 0,
             routes: [{ name: 'Login' }],
-          });
+          })
         }
       })
-      .catch(error => {
-        console.log(error.response.data.error);
-        setModalMessage(error.response.data.error);
-        setModalVisible(true);
-      });
-  };
+      .catch((error) => {
+        console.log(error.response.data.error)
+        setModalMessage(error.response.data.error)
+        setModalVisible(true)
+      })
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-      </View>
+      <View style={styles.header}></View>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>
           확인을 위해 {'\n'}
@@ -47,7 +51,7 @@ const Withdraw = ({ navigation, route }) => {
           style={styles.input}
           placeholder="현재 비밀번호"
           secureTextEntry={true}
-          onChangeText={text => setPassword(text)}
+          onChangeText={(text) => setPassword(text)}
           value={password}
         />
       </View>
@@ -64,26 +68,26 @@ const Withdraw = ({ navigation, route }) => {
             <TouchableOpacity
               style={[styles.button, styles.closeButton]}
               onPress={() => {
-                setModalVisible(false);
+                setModalVisible(false)
                 // 확인 버튼을 클릭하면 이름이 변경되고 UserInform으로 이동
                 if (modalMessage === '비밀번호 변경 성공') {
-                    navigation.navigate('MyPage');
+                  navigation.navigate('MyPage')
                 }
-            }}
+              }}
             >
               <Text style={styles.closeButtonText}>확인</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    
+
       <View style={styles.bottomSpace}></View>
       <TouchableOpacity style={styles.button} onPress={withdraw}>
         <Text style={styles.buttonText}>회원 탈퇴</Text>
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -187,6 +191,6 @@ const styles = StyleSheet.create({
     height: 20,
     marginTop: 10,
   },
-});
+})
 
-export default Withdraw;
+export default Withdraw
