@@ -20,8 +20,7 @@ const PostCreateScreen = ({ navigation }) => {
   const [dealNum, setDealNum] = useState('');
   const [deadlineDate, setDeadlineDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedButton, setSelectedButton] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState('');
+
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
@@ -60,12 +59,12 @@ const PostCreateScreen = ({ navigation }) => {
         [{ resize: { width: 800 } }], // 너비를 800으로 조정하면서 비율 유지
         { compress: 0.5 } // 압축률 설정 (0 ~ 1 사이, 1에 가까울수록 높은 품질)
       );
-  
+
       // 압축된 이미지를 Base64로 변환
       const base64Image = await FileSystem.readAsStringAsync(manipResult.uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
-  
+
       return base64Image;
     } catch (error) {
       console.error("Error compressing image and converting to Base64:", error);
@@ -103,7 +102,7 @@ const PostCreateScreen = ({ navigation }) => {
 
 
   const handleSubmit = async () => {
-    if (!productName || !price || !productContent || !dealNum || !deadlineDate || !photo || !selectedStatus) {
+    if (!productName || !price || !productContent || !dealNum || !deadlineDate || !photo ) {
       setModalMessage('빈칸 없이 모두 입력해 주세요.');
       setModalVisible(true);
       return;
@@ -115,19 +114,15 @@ const PostCreateScreen = ({ navigation }) => {
         productContent: productContent,
         dealNum: dealNum,
         deadlineDate: deadlineDate,
-        dealState: statusMapping[selectedStatus],
+        dealState: "FIRST",
         price: removeCommas(price), //앞에서 phone이랑 userAddress받아오기
         postPicture: photo,
       }).then(function (response) {
         console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
-        if (response.data.loginId == loginId) {
-          setModalMessage('회원가입이 완료되었습니다.');
-          setModalVisible(true);
-          navigation.navigate('Login');
-        } else {
-          setModalMessage('회원가입에 실패했습니다.');
-          setModalVisible(true);
-        }
+        setModalMessage('게시글이 작성되었습니다.');
+        setModalVisible(true);
+        navigation.navigate('PostListScreen');
+
       });
 
     }
@@ -182,16 +177,12 @@ const PostCreateScreen = ({ navigation }) => {
         <Text style={styles.label}>진행상황</Text>
         <ScrollView horizontal={true} style={styles.scrollView}>
           {["모집중", "입금 대기중", "상품 배송중", "상품 전달 대기", "거래 완료"].map((status) => (
-            <TouchableOpacity
-              key={status}
-              style={[
-                styles.button,
-                selectedButton === status && styles.selectedButton
-              ]}
-              onPress={() => handleButtonPress(status)}
-            >
+            <View key={status} style={[
+              styles.button,
+              status === "모집중" && styles.selectedButton
+            ]}>
               <Text style={styles.buttonText}>{status}</Text>
-            </TouchableOpacity>
+            </View>
           ))}
         </ScrollView>
 
@@ -377,7 +368,7 @@ const styles = StyleSheet.create({
     width: '100%', // 컨테이너 너비를 전체로 설정
     marginTop: 10, // 패딩 추가
   },
-  
+
   okbutton: {
     width: '100%',
     backgroundColor: '#ffcc80',
@@ -413,7 +404,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  
+
 });
 
 export default PostCreateScreen;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Modal } from 'react-native';
 import axios from 'axios';
 
 const reasons = {
@@ -24,10 +24,15 @@ const Complain = ({ navigation, route }) => {
   const [otherReason, setOtherReason] = useState('');
   const [selectedReason, setSelectedReason] = useState(null);
   const [userId, setUserId] = useState(route.params?.userId || '');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [errorModalVisible, setErrorModalVisible] = useState(false); // 신고 사유 미입력 모달 상태
 
   const handleSubmit = async () => {
-    if (!selectedReason && otherReason.trim() === '') {
-      Alert.alert('신고 사유를 선택하거나 입력해주세요.');
+    if (!selectedReason || otherReason.trim() === '') {
+      setModalMessage('신고 사유를 빈칸없이 작성해주세요.');
+      setErrorModalVisible(true); // 신고 사유 미입력 모달 열기
     } else {
       try {
         let selectedCategory = null;
@@ -35,40 +40,66 @@ const Complain = ({ navigation, route }) => {
           selectedCategory = complainCategories[selectedReason];
         }
 
-        // 서버로 POST 요청을 보냅니다.
         const response = await axios.post('http://192.168.200.116:8080/complain', {
-          complainCategory: selectedCategory, // 영어 신고 카테고리
-          complainContent: otherReason, // 신고 내용
-          targetUserId: userId // 대상 사용자 ID
+          complainCategory: selectedCategory,
+          complainContent: otherReason,
+          targetUserId: userId
         });
-        
+
         console.log('신고 내용 전송 결과:', response.data);
-        
-        // 신고 내용 전송 후 PostListScreen으로 이동합니다.
-        navigation.navigate('PostListScreen');
+
+        setModalMessage('신고가 성공적으로 접수되었습니다.');
+        setConfirmModalVisible(true);
       } catch (error) {
         console.error('Error submitting complain:', error);
-        Alert.alert('신고하기 실패', '오류가 발생했습니다. 다시 시도해주세요.');
+        setModalMessage('신고하기 실패, 오류가 발생했습니다. 다시 시도해주세요.');
+        setConfirmModalVisible(true);
       }
     }
   };
 
   const handleSelectReason = (reason) => {
-    setSelectedReason(reason === selectedReason ? null : reason);
+    setSelectedReason(reason);
+    setModalVisible(false);
+  };
+
+  const onConfirmDelete = () => {
+    setConfirmModalVisible(false);
+    navigation.pop();
+  };
+
+  const closeErrorModal = () => {
+    setErrorModalVisible(false); // 신고 사유 미입력 모달 닫기
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>신고 사유 선택</Text>
-      {Object.entries(reasons).map(([key, value]) => (
-        <TouchableOpacity
-          key={key}
-          style={[styles.reasonButton, selectedReason === key && { backgroundColor: '#FFF3C1' }]}
-          onPress={() => handleSelectReason(key)}
-        >
-          <Text style={styles.reasonButtonText}>{value}</Text>
-        </TouchableOpacity>
-      ))}
+      <Text style={styles.header}>신고 이유를 {'\n'}작성해주세요</Text>
+      <TouchableOpacity style={styles.dropdownButton} onPress={() => setModalVisible(true)}>
+        <Text style={styles.dropdownButtonText}>
+          {selectedReason ? reasons[selectedReason] : '신고 사유를 선택해주세요'}
+        </Text>
+      </TouchableOpacity>
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            {Object.entries(reasons).map(([key, value]) => (
+              <TouchableOpacity
+                key={key}
+                style={styles.reasonButton}
+                onPress={() => handleSelectReason(key)}
+              >
+                <Text style={styles.reasonButtonText}>{value}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
       <TextInput
         placeholder="신고 사유를 자세히 적어주세요."
         value={otherReason}
@@ -79,6 +110,48 @@ const Complain = ({ navigation, route }) => {
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>제출</Text>
       </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmModalVisible}
+        onRequestClose={() => setConfirmModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.button, styles.closeButton]}
+                onPress={onConfirmDelete}
+              >
+                <Text style={styles.closeButtonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={errorModalVisible}
+        onRequestClose={closeErrorModal}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.button, styles.closeButton]}
+                onPress={closeErrorModal}
+              >
+                <Text style={styles.closeButtonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -90,20 +163,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   header: {
-    fontSize: 24,
+    marginTop: 50,
+    fontSize: 30,
     fontWeight: 'bold',
-    textAlign: 'center',
     marginBottom: 20,
     color: '#333333',
+    marginBottom: 40,
+  },
+  dropdownButton: {
+    padding: 15,
+    borderRadius: 15,
+    borderColor: '#cccccc',
+    borderWidth: 1,
+    marginBottom: 15,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+  },
+  dropdownButtonText: {
+    fontSize: 16,
+    color: '#333333',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
   },
   reasonButton: {
-    padding: 15,
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 20,
     borderColor: '#cccccc',
     borderWidth: 1,
     marginBottom: 10,
     alignItems: 'center',
     backgroundColor: '#ffffff',
+    width: '80%',
   },
   reasonButtonText: {
     fontSize: 16,
@@ -115,10 +216,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 20,
-    minHeight: 100, // 최소 높이 지정
+    minHeight: 100,
   },
   submitButton: {
-    backgroundColor: '#FFD700', // 짙은 노란색
+    backgroundColor: '#ffcc80',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
@@ -126,6 +227,30 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: '#ffffff',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  button: {
+    width: '100%',
+    backgroundColor: '#ffcc80',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  closeButton: {
+    backgroundColor: '#fff',
+    width: '50%',
+  },
+  closeButtonText: {
+    color: '#000',
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });

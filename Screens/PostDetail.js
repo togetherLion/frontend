@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, FlatList } from 'react-native';
 //import Modal from 'react-native-modal';
 import { Avatar } from 'react-native-elements';
@@ -12,6 +12,8 @@ moment.locale('ko');
 
 
 const PostDetail = ({ route }) => { // navigation 제거
+
+    const scrollViewRef = useRef(null);
 
     const navigation = useNavigation();
 
@@ -74,20 +76,32 @@ const PostDetail = ({ route }) => { // navigation 제거
     );
 
     const navigateToPostDetail = (postId) => {
-        setPostId(postId); // 새로운 postid 설정
         console.log(postId);
+        setPostId(postId);
+    };
+
+    const handlePostIdChange = (newPostId) => {
+        setPostId(newPostId);
     };
 
 
 
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            console.log(postId);
-            getPostDetail();
-        });
-        return unsubscribe;
+        const fetchData = async () => {
+            try {
+                getPostDetail();
+                setForceRender(prev => !prev);  // 강제 리렌더링 유도
+                scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
     }, [postId, navigation]);
+
+
 
     async function getPostDetail() {
         try {
@@ -99,7 +113,7 @@ const PostDetail = ({ route }) => { // navigation 제거
             const [resp1, resp2] = responses;
 
             if (resp1.data !== null && resp1.data !== "") {
-                console.log(resp1.data);
+                //console.log(resp1.data);
                 //console.log(resp1.data.post.postPicture);
 
                 setPost(resp1.data.post);
@@ -209,6 +223,11 @@ const PostDetail = ({ route }) => { // navigation 제거
         navigation.navigate('Profile', { userId: postuserId });
     };
 
+    const handleWaitlist = () => {
+        navigation.navigate('WaitingTable', { postId: post.postId });
+      };
+    
+
 
     if (loading) {
         return null;
@@ -244,7 +263,7 @@ const PostDetail = ({ route }) => { // navigation 제거
                 </View>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.headerContainer}>
                     <Image source={{ uri: post.postPicture }} style={styles.headerImage} />
                 </View>
@@ -315,9 +334,13 @@ const PostDetail = ({ route }) => { // navigation 제거
                     <Ionicons name={isgood ? "heart" : "heart-outline"} size={33} color="pink" style={styles.heartIcon} />
                 </TouchableOpacity>
                 <Text style={styles.price}>{formatPrice(post.price.toString())}원</Text>
-                {userId !== postuserId && (
+                {userId !== postuserId ? (
                     <TouchableOpacity style={styles.wantbutton} onPress={handlePar}>
                         <Text style={styles.buttonText}>참여하기</Text>
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity style={styles.wantbutton} onPress={handleWaitlist}>
+                        <Text style={styles.buttonText}>대기테이블 보기</Text>
                     </TouchableOpacity>
                 )}
             </View>

@@ -47,7 +47,7 @@ const PostListScreen = ({ navigation, route }) => {
 
     const confirmAction = () => {
         setModalVisible(false);
-        navigation.navigate('Alarmlist');
+        navigation.navigate('Alarmlist', {userId : userId});
 
     };
 
@@ -137,7 +137,7 @@ const PostListScreen = ({ navigation, route }) => {
                 <TouchableOpacity onPress={() => navigation.navigate('SearchScreen', { userId: userId })} style={styles.bottomBarItem}>
                     <MaterialIcons name="search" size={24} color="#bbb" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomBarItem}>
+                <TouchableOpacity  onPress={() => navigation.navigate('ChatButton', { userId: userId })} style={styles.bottomBarItem}>
                     <MaterialIcons name="chat" size={24} color="#bbb" />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('MyPage', { userId: userId })} style={styles.bottomBarItem}>
