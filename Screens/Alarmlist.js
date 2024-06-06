@@ -6,6 +6,8 @@ import axios from 'axios';
 const Alarmlist = ({ navigation }) => {
   const [alarmData, setAlarmData] = useState([]);
 
+
+
   useEffect(() => {
     fetchAlarmData();
   }, []);
@@ -46,6 +48,7 @@ const Alarmlist = ({ navigation }) => {
     }
   };
 
+
   const showAlarmDetails = async (alarmId) => {
     const alarm = alarmData.find(alarm => alarm.alarmId === alarmId);
     if (alarm) {
@@ -65,10 +68,29 @@ const Alarmlist = ({ navigation }) => {
       }, {});
       await AsyncStorage.setItem('alarmReadStatuses', JSON.stringify(alarmReadStatuses));
 
-      // 알람 타입이 'POSTMODIFY', 'REQUEST', 'REQACCEPT', 'REQREJECT'일 때, postId 대신 connectId를 사용하여 게시글 상세 페이지로 이동
-      if (['POSTMODIFY', 'REQUEST', 'REQACCEPT', 'REQREJECT'].includes(alarm.alarmType)) {
-        console.log('Navigating to PostDetail with postId:', alarm.postId);
-        navigation.navigate('PostDetail', { postId: alarm.connectId }); // postId 대신에 connectId 사용
+      // 알람 타입이 'POSTMODIFY', 'REQUEST', 'REQACCEPT', 'REQREJECT'일 때, connetId 대신 postId를 사용하여 게시글 상세 페이지로 이동
+      if (['POSTMODIFY', 'REQUEST', 'REQACCEPT', 'REQREJECT', 'NEWPOST'].includes(alarm.alarmType)) {
+        console.log('Navigating to PostDetail with postId:', alarm.connectId);
+        navigation.navigate('PostDetail', { postId: alarm.connectId, userId : alarm.userId }); // postId 대신에 connectId 사용
+      } else if (alarm.alarmType === 'CREATECHAT') {
+        try {
+            console.log("시도함");
+            console.log(alarm.connectId);
+            const response = await axios.get(`http://192.168.200.116:8080/waitingdeal/check-chat-room/${alarm.connectId}`);
+            //console.log(response.data);
+            console.log(response.data.roomId);
+            console.log(response.data.post.userId);
+            //console.log(response.data.roomId);
+
+            navigation.navigate('ChatRoom', { 
+                userId: alarm.userId, 
+                roomId: response.data.roomId, // response.data에서 roomId 접근
+                postUserId: response.data.post.userId, // response.data에서 post.userId 접근
+                postId: alarm.connectId // connectID의 철자 오류 수정
+            });
+        } catch (error) {
+            console.error('Error fetching chat room:', error.response ? error.response.data : error.message);
+        }
       }
 
       // Mark alarm as read on the server

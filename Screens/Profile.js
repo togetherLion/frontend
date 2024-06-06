@@ -57,7 +57,7 @@ const Profile = ({ navigation, route }) => {
 
 
       if (resp1.data !== null && resp1.data !== "") {
-        //console.log(resp.data.complainCount);
+        console.log(resp1.data);
         setNickname(resp1.data.nickname)
         setProfileIntro(resp1.data.profileIntro)
         setFollowerCount(resp1.data.followerCount)
@@ -69,7 +69,7 @@ const Profile = ({ navigation, route }) => {
         setComplainCount(resp1.data.complainCount)
         setAvgStarScore(resp1.data.avgStarScore)
         setForceRender(prev => !prev);
-        console.log(avgStarScore);
+        //console.log(followingCount);
       } 
 
 

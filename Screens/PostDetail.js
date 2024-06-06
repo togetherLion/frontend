@@ -225,8 +225,13 @@ const PostDetail = ({ route }) => { // navigation 제거
 
     const handleWaitlist = () => {
         navigation.navigate('WaitingTable', { postId: post.postId });
-      };
-    
+    };
+
+
+    const handleChatCreation = () => {
+        navigation.navigate('CreateChat', { postId: post.postId });
+    };
+
 
 
     if (loading) {
@@ -338,9 +343,15 @@ const PostDetail = ({ route }) => { // navigation 제거
                     <TouchableOpacity style={styles.wantbutton} onPress={handlePar}>
                         <Text style={styles.buttonText}>참여하기</Text>
                     </TouchableOpacity>
+                ) : post.dealNum === waitingDeals ? (
+                    <TouchableOpacity style={styles.wantbutton} onPress={handleChatCreation}>
+                        <Text style={styles.buttonText}>채팅방 생성</Text>
+                    </TouchableOpacity>
+                    
                 ) : (
                     <TouchableOpacity style={styles.wantbutton} onPress={handleWaitlist}>
                         <Text style={styles.buttonText}>대기테이블 보기</Text>
+                        
                     </TouchableOpacity>
                 )}
             </View>

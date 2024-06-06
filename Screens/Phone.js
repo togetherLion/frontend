@@ -27,11 +27,11 @@ const Phone = ({ navigation }) => {
               }
               setModalVisible(true);
             })
-            .catch(function (error) {
-              console.error('에러 발생:', error);
-              setModalMessage('서버 요청 중 에러가 발생했습니다.');
-              setModalVisible(true);
-            });
+            .catch(error => {
+                console.log(error.response.data.error);
+                setModalMessage(error.response.data.error);
+                setModalVisible(true);
+              });
         }
       };
 

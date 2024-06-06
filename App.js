@@ -28,6 +28,7 @@ import PostCreateScreen from './Screens/PostCreateScreen.js'
 import PostDetail from './Screens/PostDetail.js'
 import SearchScreen from './Screens/SearchScreen.js'
 import PostEditScreen from './Screens/PostEditScreen.js'
+import CreateChat from './Screens/CreateChat.js'
 
 import FirstScreen from './Screens/first.jsx'
 import FindIdScreen from './Screens/findId.jsx'
@@ -82,6 +83,8 @@ export default function App() {
           <Stack.Screen name="PostDetail" component={PostDetail} />
           <Stack.Screen name="SearchScreen" component={SearchScreen} />
           <Stack.Screen name="PostEditScreen" component={PostEditScreen} />
+          <Stack.Screen name="CreateChat" component={CreateChat} />
+
 
           <Stack.Screen name="First" component={FirstScreen} />
             <Stack.Screen name="FindId" component={FindIdScreen} />

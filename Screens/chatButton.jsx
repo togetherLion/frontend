@@ -79,7 +79,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
     }
   }
 
-  const joinChatRoom = async () => {
+  const joinChatRoom = async () => { //룸
     try {
       const response = await axios.get(
         'http://192.168.200.116:8080/waitingdeal/check-chat-room/1'
