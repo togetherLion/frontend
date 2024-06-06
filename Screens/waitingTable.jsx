@@ -73,6 +73,26 @@ const WaitingTableScreen = ({ navigation, route }) => {
     }
   }
 
+  const rejectDeal = async (userId, postId) => {
+    try {
+      console.log(userId)
+      console.log(postId)
+      await axios.put(
+        'http://192.168.200.142:8080/waitingdeal/reject?' +
+          'userId=' +
+          userId +
+          '&postId=' +
+          postId
+      )
+      // 요청이 성공하면 상태 업데이트
+      setPendingUserData(
+        pendingUserData.filter((user) => user.userId !== userId)
+      )
+    } catch (error) {
+      console.error('Error sending rejectDeal:', error)
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -124,12 +144,20 @@ const WaitingTableScreen = ({ navigation, route }) => {
               >
                 <Text style={styles.waitingItem}>{user.nickname}</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.acceptButton}
-                onPress={() => acceptDeal(user.userId, 1)}
-              >
-                <Text style={styles.acceptButtonText}>수락</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonGroup}>
+                <TouchableOpacity
+                  style={styles.acceptButton}
+                  onPress={() => acceptDeal(user.userId, 1)}
+                >
+                  <Text style={styles.acceptButtonText}>수락</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={() => rejectDeal(user.userId, 1)}
+                >
+                  <Text style={styles.acceptButtonText}>거절</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
         {activeTab === 'accepted' &&
@@ -196,25 +224,35 @@ const styles = StyleSheet.create({
   },
   scrollViewItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
+    justifyContent: 'space-between',
+    padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#ccc',
   },
   waitingItem: {
     fontSize: 16,
-    color: '#333',
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   acceptButton: {
     backgroundColor: '#F4C089',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    marginRight: 5, // 버튼 사이에 공간이 없도록 설정
+  },
+  rejectButton: {
+    backgroundColor: '#D1180B',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
   },
   acceptButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontSize: 14,
   },
 })
 
