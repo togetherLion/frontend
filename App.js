@@ -12,6 +12,7 @@ import MyPage from './Screens/MyPage.js'
 import Login from './Screens/Login.js'
 import UserInform from './Screens/UserInform.js'
 import EditAccount from './Screens/EditAccount.js'
+import EditProfile from './Screens/EditProfile.js'
 import EditPhone from './Screens/EditPhone.js'
 import EditName from './Screens/EditName.js'
 import EditAddress from './Screens/EditAddress.js'
@@ -24,7 +25,9 @@ import Follower from './Screens/Follower.js'
 import PostListScreen from './Screens/PostListScreen.js'
 import Alarmlist from './Screens/Alarmlist.js'
 import PostCreateScreen from './Screens/PostCreateScreen.js'
-
+import PostDetail from './Screens/PostDetail.js'
+import SearchScreen from './Screens/SearchScreen.js'
+import PostEditScreen from './Screens/PostEditScreen.js'
 
 const Stack = createStackNavigator();
 
@@ -41,7 +44,7 @@ export default function App() {
 
 
     <NavigationContainer >
-      <Stack.Navigator initialRouteName="PostCreateScreen" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Place" component={Place} />
         <Stack.Screen name="SignupScreen" component={SignupScreen} />
         <Stack.Screen name="Phone" component={Phone} />
@@ -54,6 +57,7 @@ export default function App() {
         <Stack.Screen name="EditAddress" component={EditAddress} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="EditPassword" component={EditPassword} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Withdraw" component={Withdraw} />
         <Stack.Screen name="Complain" component={Complain} />
         <Stack.Screen name="Following" component={Following} />
@@ -61,6 +65,9 @@ export default function App() {
         <Stack.Screen name="PostListScreen" component={PostListScreen} />
         <Stack.Screen name="Alarmlist" component={Alarmlist} />
         <Stack.Screen name="PostCreateScreen" component={PostCreateScreen} />
+        <Stack.Screen name="PostDetail" component={PostDetail} />
+        <Stack.Screen name="SearchScreen" component={SearchScreen} />
+        <Stack.Screen name="PostEditScreen" component={PostEditScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

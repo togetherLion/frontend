@@ -7,12 +7,11 @@ import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import * as ImageManipulator from 'expo-image-manipulator';
 
 
 const SERVER_URL = 'http://192.168.200.116:8080/posts';
 
-const PostCreateScreen = ({ navigation }) => {
+const ReviewScreen = ({ navigation }) => {
   const [photo, setPhoto] = useState(null);
   const [productName, setProductName] = useState('');
   const [price, setPrice] = useState('');
@@ -47,28 +46,19 @@ const PostCreateScreen = ({ navigation }) => {
     });
 
     if (!result.cancelled && result.assets && result.assets.length > 0) {
-      const base64Image = await compressImageAndConvertToBase64(result.assets[0].uri);
+      const base64Image = await convertToBase64(result.assets[0].uri);
       setPhoto(`data:image/jpeg;base64,${base64Image}`);
     }
   };
 
-  const compressImageAndConvertToBase64 = async (uri) => {
+  const convertToBase64 = async (uri) => {
     try {
-      // 이미지 압축: 사이즈 조정 및 압축률 설정
-      const manipResult = await ImageManipulator.manipulateAsync(
-        uri,
-        [{ resize: { width: 800 } }], // 너비를 800으로 조정하면서 비율 유지
-        { compress: 0.5 } // 압축률 설정 (0 ~ 1 사이, 1에 가까울수록 높은 품질)
-      );
-  
-      // 압축된 이미지를 Base64로 변환
-      const base64Image = await FileSystem.readAsStringAsync(manipResult.uri, {
+      const base64Image = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
-  
       return base64Image;
     } catch (error) {
-      console.error("Error compressing image and converting to Base64:", error);
+      console.error("Error converting image to Base64:", error);
       throw error;
     }
   };
@@ -416,4 +406,4 @@ const styles = StyleSheet.create({
   
 });
 
-export default PostCreateScreen;
+export default ReviewScreen;

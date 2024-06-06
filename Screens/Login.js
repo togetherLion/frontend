@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, Modal} from 'react-native';
 import axios from 'axios';
 
 const Login = ({ navigation }) => {
@@ -7,12 +7,17 @@ const Login = ({ navigation }) => {
     const [loginId, setloginId] = useState('')
     const [password, setPassword] = useState('')
 
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
+
 
     function handleLogin() {
         if (loginId.trim() === "") {
-            Alert.alert("아이디 입력 확인", "아이디가 입력되지 않았습니다.");
+            setModalMessage('아이디가 입력되지 않았습니다.');
+            setModalVisible(true);
         } else if (password.trim() === "") {
-            Alert.alert("비밀번호 입력 확인", "비밀번호가 입력되지 않았습니다.");
+            setModalMessage('비밀번호가 입력되지 않았습니다.');
+            setModalVisible(true);
         } else {
             axios.post("http://192.168.200.116:8080/user/login", {
                 loginId: loginId,
@@ -34,7 +39,7 @@ const Login = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Image source={require('../assets/Logo.png')} style={styles.logo} />
+            <Image source={require('../assets/balbadag.png')} style={styles.logo} />
             <Text style={styles.title}>LOGIN</Text>
             <TextInput
                 style={styles.input}
@@ -60,11 +65,35 @@ const Login = ({ navigation }) => {
             </TouchableOpacity>
             <View style={styles.footer}>
                 <Text style={styles.footerText}>계정이 없으신가요? </Text>
-                <TouchableOpacity onPress={() => { }}>
+                <TouchableOpacity onPress={() => { navigation.navigate('Phone') }}>
                     <Text style={[styles.footerText, styles.footerLink]}>회원가입</Text>
                 </TouchableOpacity>
             </View>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalBackground}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalText}>{modalMessage}</Text>
+                        <TouchableOpacity
+                            style={[styles.button, styles.closeButton]}
+                            onPress={() => setModalVisible(false)}
+                        >
+                            <Text style={styles.closeButtonText}>확인</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+
+
         </View>
+
+
     );
 };
 
@@ -77,9 +106,9 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     logo: {
-        width: 150,
-        height: 150,
-        //marginBottom: 20,
+        width: 130,
+        height: 130,
+        marginBottom: 30,
     },
     title: {
         fontSize: 30,
@@ -129,6 +158,41 @@ const styles = StyleSheet.create({
         color: 'black', // 링크 색상
         fontWeight: 'bold',
     },
+    button: {
+        width: '100%',
+        backgroundColor: '#ffcc80',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+      },
+      closeButton: {
+        backgroundColor: '#fff',
+        //marginTop: 10,
+        width: '50%',
+      },
+      closeButtonText: {
+        color: '#000',
+        fontSize: 14,
+        fontWeight: 'bold',
+      },
+      modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      },
+      modalContainer: {
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+      },
+      modalText: {
+        fontSize: 16,
+        marginBottom: 10,
+      },
+    
 });
 
 export default Login;

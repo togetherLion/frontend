@@ -3,14 +3,11 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'rea
 import { Avatar, Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import moment from 'moment';
+import 'moment/locale/ko';
 import { Ionicons } from '@expo/vector-icons';
 
-const reviews = [
-  { id: 1, text: '안녕하세요반갑습니다기및', rating: 5 },
-  { id: 2, text: '매우 친절하과 완전 짱입낟. 다음에 또 하고싶어요', rating: 4 },
-  { id: 3, text: 'Would like to use it again.', rating: 1 },
-  // 여기에 더 많은 리뷰를 추가할 수 있습니다.
-];
+moment.locale('ko'); 
 
 const Profile = ({ navigation, route }) => {
   const [isMyProfile, setIsMyProfile] = useState(false);
@@ -21,6 +18,7 @@ const Profile = ({ navigation, route }) => {
   const [followingCount, setFollowingCount] = useState('');
   const [townName, setTownName] = useState('');
   const [complainCount, setComplainCount] = useState('');
+  const [avgStarScore, setAvgStarScore] = useState('');
   const [profilePicture, setProfilePicture] = useState('default_image_url');
   const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const [forceRender, setForceRender] = useState(false);
@@ -28,6 +26,7 @@ const Profile = ({ navigation, route }) => {
   const [modalMessage, setModalMessage] = useState('');
   const [modalType, setModalType] = useState('');
   const [userId, setUserId] = useState(route.params?.userId || '');
+  const [reviews, setReviews] = useState([]);
 
 
 
@@ -44,24 +43,41 @@ const Profile = ({ navigation, route }) => {
 
   async function getProfile() {
     try {
-      const resp = await axios.post("http://192.168.200.116:8080/user/userProfile", {
-        userId: userId,
-      });
-      if (resp.data !== null && resp.data !== "") {
+
+      const responses = await Promise.all([
+        axios.post("http://192.168.200.116:8080/user/userProfile", {
+          userId: userId,
+        }),
+        axios.get(`http://192.168.200.116:8080/review/user/${userId}`),
+      ]);
+
+      const [resp1, resp2] = responses;
+
+
+
+
+      if (resp1.data !== null && resp1.data !== "") {
         //console.log(resp.data.complainCount);
-        setNickname(resp.data.nickname)
-        setProfileIntro(resp.data.profileIntro)
-        setFollowerCount(resp.data.followerCount)
-        setFollowingCount(resp.data.followingCount)
-        setTownName(resp.data.townName)
-        setProfilePicture(resp.data.profilePicture)
-        setIsFollowing(resp.data.following)
-        setIsMyProfile(resp.data.myProfile)
-        setComplainCount(resp.data.complainCount)
+        setNickname(resp1.data.nickname)
+        setProfileIntro(resp1.data.profileIntro)
+        setFollowerCount(resp1.data.followerCount)
+        setFollowingCount(resp1.data.followingCount)
+        setTownName(resp1.data.townName)
+        setProfilePicture(resp1.data.profilePicture)
+        setIsFollowing(resp1.data.following)
+        setIsMyProfile(resp1.data.myProfile)
+        setComplainCount(resp1.data.complainCount)
+        setAvgStarScore(resp1.data.avgStarScore)
         setForceRender(prev => !prev);
-      } else {
-        console.log("정보 가져오기 실패");
+        console.log(avgStarScore);
+      } 
+
+
+      if (resp2.data) {
+        setReviews(resp2.data);
       }
+
+
     } catch (err) {
       console.log(`에러 메시지: ${err}`);
     } finally {
@@ -80,6 +96,7 @@ const Profile = ({ navigation, route }) => {
       navigation.navigate('Complain');
     }
   };
+
 
 
   const confirmFollow = () => {
@@ -197,18 +214,19 @@ const Profile = ({ navigation, route }) => {
           </View>
           <View style={styles.reviewSection}>
             <Text style={styles.reviewTitle}>작성된 후기</Text>
-            <Text style={styles.aveTitle}>평점 </Text>
+            <Text style={styles.aveTitle}>평점  {avgStarScore}</Text>
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
               {reviews.map((review) => (
                 <View key={review.id} style={styles.reviewCard}>
                   <View style={styles.ratingContainer}>
                     {/* 별점 표시 */}
-                    {[...Array(review.rating)].map((_, index) => (
+                    {[...Array(review.starScore)].map((_, index) => (
                       <Icon key={index} name="star" size={15} color="#FFD700" />
                     ))}
-                    <Text style={styles.ratingText}>{review.rating}</Text>
+                    <Text style={styles.ratingText}>{review.starScore}</Text>
                   </View>
-                  <Text style={styles.reviewText}>{review.text}</Text>
+                  <Text style={styles.reviewText}>{review.reviewContent}</Text>
+                  <Text style={styles.uploadText}>{moment(review.uploadDate).fromNow()}</Text>
                 </View>
               ))}
             </ScrollView>
@@ -353,6 +371,10 @@ const styles = StyleSheet.create({
   reviewText: {
     fontSize: 16,
     marginTop: 15,
+  },
+  uploadText : {
+    fontSize: 12,
+    marginTop: 50,
   },
   centeredView: {
     marginTop: 30,

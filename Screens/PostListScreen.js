@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList, Alert, Modal } from 'react-native';
 import { Avatar } from 'react-native-elements';
-import { MaterialIcons, Ionicons} from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 const PostListScreen = ({ navigation, route }) => {
@@ -11,6 +11,7 @@ const PostListScreen = ({ navigation, route }) => {
     const [townName, setTownName] = useState('');
     const [userId, setUserId] = useState(route.params?.userId || '');
     const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -24,11 +25,14 @@ const PostListScreen = ({ navigation, route }) => {
             const resp = await axios.get("http://192.168.200.116:8080/posts/region")
 
             if (resp.data !== null && resp.data !== "") {
+                //console.log(resp.data);
                 setTownName(resp.data.townName);
                 setPosts(resp.data.posts);
             }
         } catch (err) {
             console.log(`에러 메시지: ${err}`);
+        } finally {
+            setLoading(false); // 로딩 상태 갱신
         }
     }
 
@@ -47,39 +51,46 @@ const PostListScreen = ({ navigation, route }) => {
 
     };
 
+    
+
 
     const PostListItem = ({ post }) => (
-        <TouchableOpacity onPress={() => navigation.navigate('PostDetailScreen', { postId: post.postId })}>
+        <TouchableOpacity onPress={() => navigation.navigate('PostDetail', { postId: post.postRes.postId, userId: userId })}>
             <View style={styles.postItem}>
                 <View style={styles.iconContainer}>
-                    {post.postPicture ? (
-                        <Image source={{ uri: post.postPicture }} style={styles.postImage} />
+                    {post.postRes.postPicture ? (
+                        <Image source={{ uri: post.postRes.postPicture }} style={styles.postImage} />
                     ) : (
                         <Text>No Image</Text>
                     )}
                 </View>
                 <View style={styles.postContent}>
-                    <Text style={styles.postTitle}>{post.productName}</Text>
+                    <Text style={styles.postTitle}>{post.postRes.productName}</Text>
                     <View style={styles.postInfo}>
-                        <Text style={styles.postAuthor}>{post.author}</Text>
-                        <Text style={styles.postLocation}>{post.location}</Text>
-                        <Text style={styles.postDeadline}>{post.deadlineDate}</Text>
+                        <Text style={styles.postAuthor}>{post.postRes.author}</Text>
+                        <Text style={styles.postLocation}>{post.postRes.location}</Text>
+                        <Text style={styles.postDeadline}>{post.postRes.deadlineDate}</Text>
                     </View>
-                    {post.additionalInfo && <Text style={styles.additionalInfo}>{post.additionalInfo}</Text>}
+                    {post.additionalInfo && <Text style={styles.additionalInfo}>{post.postRes.additionalInfo}</Text>}
                 </View>
-                <TouchableOpacity onPress={() => toggleFavorite(post.id)}>
+                <TouchableOpacity onPress={() => toggleFavorite(post.postRes.id)}>
                     <Text>Favorite</Text>
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
     );
 
+    if (loading) {
+        return null; // 로딩 중일 때는 화면에 아무것도 렌더링하지 않음
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>{townName}</Text>
+                <Image source={require('../assets/balbadag.png')} style={styles.logo} />
+                <Text style={styles.title}>  {townName}</Text>
                 <TouchableOpacity style={styles.notificationIcon} onPress={() => handleNotificationPress()}>
-                    <MaterialIcons name="mail-outline" size={30} color="black" marginRight={8} marginTop={6} />
+                    <MaterialIcons name="mail-outline" size={30} color="#ffcc80" marginRight={8} marginTop={6} />
                 </TouchableOpacity>
             </View>
             <FlatList
@@ -121,16 +132,16 @@ const PostListScreen = ({ navigation, route }) => {
 
             <View style={styles.bottomBar}>
                 <TouchableOpacity style={styles.bottomBarItem}>
-                    <MaterialIcons name="home" size={24} color="black" />
+                    <MaterialIcons name="home" size={24} color="#bbb" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('SearchScreen', { userId: userId })} style={styles.bottomBarItem}>
+                    <MaterialIcons name="search" size={24} color="#bbb" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.bottomBarItem}>
-                    <MaterialIcons name="search" size={24} color="black" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomBarItem}>
-                    <MaterialIcons name="chat" size={24} color="black" />
+                    <MaterialIcons name="chat" size={24} color="#bbb" />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('MyPage', { userId: userId })} style={styles.bottomBarItem}>
-                    <MaterialIcons name="person" size={24} color="black" />
+                    <MaterialIcons name="person" size={24} color="#bbb" />
                 </TouchableOpacity>
             </View>
 
@@ -145,10 +156,12 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        //alignContent: 'center',
+        
+        //justifyContent: 'space-between',
         width: '100%',
-        padding: 15,
-        marginTop: 10,
+        padding: 7,
+        marginTop: 25,
         marginLeft: 5,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
@@ -160,20 +173,21 @@ const styles = StyleSheet.create({
         height: 100,
         marginRight: 16,
         overflow: 'hidden',
-        backgroundColor: '#007AFF',
+        //backgroundColor: '#007AFF',
     },
     postItem: {
         flexDirection: 'row',
-        marginTop: 7,
+        marginTop: 12,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
         paddingHorizontal: 16,
-        paddingBottom: 7,
+        paddingBottom: 12,
     },
     postImage: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
+        borderRadius: 14,
     },
     postContent: {
         flex: 1,
@@ -279,8 +293,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 12,
-      },
-
+    },
+    logo: {
+        width: 40,
+        height: 40,
+        //marginBottom: 20,
+    },
+    notificationIcon: {
+        position: 'absolute',
+        right: 20,
+        marginTop: 8,
+    },
 });
 
 export default PostListScreen;

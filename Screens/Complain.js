@@ -1,102 +1,83 @@
 import React, { useState } from 'react';
-import { Alert, TextInput, StyleSheet, View, Text, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 
-const Complain = ({ navigation, route }) => {
-  const [nowPassword, setNowPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
+const reasons = {
+  CANCEL: '무단 거래 파기',
+  DISCOMFORT: '불쾌감 유발',
+  NOPAY: '미송금',
+  ADVERT: '광고성 게시글',
+  BANSALE: '거래 금지 품목 판매',
+  OTHERS: '기타'
+};
 
-  const handleSubmit = () => {
-    if (newPassword !== confirmPassword) {
-      setModalMessage('비밀번호 확인이 일치하지 않습니다.');
-      setModalVisible(true);
+const complainCategories = {
+  CANCEL: 'CANCEL',
+  DISCOMFORT: 'DISCOMFORT',
+  NOPAY: 'NOPAY',
+  ADVERT: 'ADVERT',
+  BANSALE: 'BANSALE',
+  OTHERS: 'OTHERS'
+};
+
+const Complain = ({ navigation, route }) => {
+  const [otherReason, setOtherReason] = useState('');
+  const [selectedReason, setSelectedReason] = useState(null);
+  const [userId, setUserId] = useState(route.params?.userId || '');
+
+  const handleSubmit = async () => {
+    if (!selectedReason && otherReason.trim() === '') {
+      Alert.alert('신고 사유를 선택하거나 입력해주세요.');
     } else {
-      axios.post("http://192.168.200.116:8080/user/changePw", { nowPassword: nowPassword, newPassword: newPassword })
-        .then((resp) => {
-          console.log(resp.data);
-          if (resp.data !== null && resp.data !== "") {
-            setModalMessage('비밀번호 변경 성공');
-            setModalVisible(true);
-          }
-        })
-        .catch(error => {
-          console.log(error.response.data.error);
-          setModalMessage(error.response.data.error);
-          setModalVisible(true);
+      try {
+        let selectedCategory = null;
+        if (selectedReason) {
+          selectedCategory = complainCategories[selectedReason];
+        }
+
+        // 서버로 POST 요청을 보냅니다.
+        const response = await axios.post('http://192.168.200.116:8080/complain', {
+          complainCategory: selectedCategory, // 영어 신고 카테고리
+          complainContent: otherReason, // 신고 내용
+          targetUserId: userId // 대상 사용자 ID
         });
+        
+        console.log('신고 내용 전송 결과:', response.data);
+        
+        // 신고 내용 전송 후 PostListScreen으로 이동합니다.
+        navigation.navigate('PostListScreen');
+      } catch (error) {
+        console.error('Error submitting complain:', error);
+        Alert.alert('신고하기 실패', '오류가 발생했습니다. 다시 시도해주세요.');
+      }
     }
+  };
+
+  const handleSelectReason = (reason) => {
+    setSelectedReason(reason === selectedReason ? null : reason);
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}></View>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>
-          새로운 비밀번호를 {'\n'}
-          입력해주세요
-        </Text>
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="현재 비밀번호"
-          secureTextEntry={true}
-          onChangeText={text => setNowPassword(text)}
-          value={nowPassword}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="변경할 비밀번호"
-          secureTextEntry={true}
-          onChangeText={text => setNewPassword(text)}
-          value={newPassword}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="비밀번호 확인"
-          secureTextEntry={true}
-          onChangeText={text => setConfirmPassword(text)}
-          value={confirmPassword}
-        />
-      </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-          if (modalMessage === '비밀번호 변경 성공') {
-            navigation.navigate('MyPage');
-          }
-        }}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>{modalMessage}</Text>
-            <TouchableOpacity
-              style={[styles.button, styles.closeButton]}
-              onPress={() => {
-                setModalVisible(false);
-                if (modalMessage === '비밀번호 변경 성공') {
-                  navigation.navigate('MyPage');
-                }
-              }}
-            >
-              <Text style={styles.closeButtonText}>확인</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      <View style={styles.bottomSpace}></View>
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>비밀번호 변경</Text>
+      <Text style={styles.header}>신고 사유 선택</Text>
+      {Object.entries(reasons).map(([key, value]) => (
+        <TouchableOpacity
+          key={key}
+          style={[styles.reasonButton, selectedReason === key && { backgroundColor: '#FFF3C1' }]}
+          onPress={() => handleSelectReason(key)}
+        >
+          <Text style={styles.reasonButtonText}>{value}</Text>
+        </TouchableOpacity>
+      ))}
+      <TextInput
+        placeholder="신고 사유를 자세히 적어주세요."
+        value={otherReason}
+        onChangeText={setOtherReason}
+        style={styles.input}
+        multiline
+      />
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <Text style={styles.submitButtonText}>제출</Text>
       </TouchableOpacity>
     </View>
   );
@@ -105,103 +86,47 @@ const Complain = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
     padding: 20,
-    paddingTop: 60,
-    marginLeft: 10,
-    marginRight: 5,
+    backgroundColor: '#ffffff',
   },
   header: {
-    width: '100%',
-    alignItems: 'flex-start',
-    marginBottom: 50,
-  },
-  titleContainer: {
-    width: '100%',
-    alignItems: 'flex-start',
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'left',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#333333',
   },
-  inputContainer: {
-    flexDirection: 'row',
+  reasonButton: {
+    padding: 15,
+    borderRadius: 8,
+    borderColor: '#cccccc',
+    borderWidth: 1,
+    marginBottom: 10,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 15,
+    backgroundColor: '#ffffff',
   },
-  inputRow: {
-    width: '100%',
-    marginBottom: 15,
+  reasonButtonText: {
+    fontSize: 16,
+    color: '#333333',
   },
   input: {
-    width: '70%',
-    height: 40,
-    borderBottomColor: '#000000',
-    borderBottomWidth: 1,
-    paddingHorizontal: 10,
-  },
-  checkButton: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: '#cccccc',
+    borderRadius: 8,
     padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 10,
+    marginBottom: 20,
+    minHeight: 100, // 최소 높이 지정
   },
-  checkButtonText: {
-    color: '#000',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  button: {
-    width: '100%',
-    backgroundColor: '#ffcc80',
-    padding: 20,
-    borderRadius: 10,
+  submitButton: {
+    backgroundColor: '#FFD700', // 짙은 노란색
+    paddingVertical: 15,
+    borderRadius: 8,
     alignItems: 'center',
   },
-  closeButton: {
-    backgroundColor: '#fff',
-    width: '50%',
-  },
-  closeButtonText: {
-    color: '#000',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
-  },
-  modalText: {
+  submitButtonText: {
+    color: '#ffffff',
     fontSize: 16,
-    marginBottom: 10,
-  },
-  bottomSpace: {
-    height: 20,
-    marginTop: 10,
+    fontWeight: 'bold',
   },
 });
 

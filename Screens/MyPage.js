@@ -32,6 +32,7 @@ const MyPage = ({ navigation, route }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+      console.log("마이페이지 진입");
       getMyPage();
     });
     return unsubscribe;
@@ -79,7 +80,7 @@ const MyPage = ({ navigation, route }) => {
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
+    <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('PostDetail', {postId : item.postId, userId : userId} )}>
       <Image style={styles.itemImage} source={{ uri: item.postPicture }} />
       <Text style={styles.itemTitle}>{item.productName}</Text>
       <Text style={styles.itemPrice}>{item.price}원</Text>
