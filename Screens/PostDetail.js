@@ -90,7 +90,7 @@ const PostDetail = ({ route }) => { // navigation 제거
     useEffect(() => {
         const fetchData = async () => {
             try {
-                getPostDetail();
+                await getPostDetail();
                 setForceRender(prev => !prev);  // 강제 리렌더링 유도
                 scrollViewRef.current?.scrollTo({ y: 0, animated: true });
             } catch (error) {
@@ -99,6 +99,10 @@ const PostDetail = ({ route }) => { // navigation 제거
         };
 
         fetchData();
+
+        const unsubscribe = navigation.addListener('focus', fetchData);
+
+        return unsubscribe;
     }, [postId, navigation]);
 
 

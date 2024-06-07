@@ -29,6 +29,9 @@ import PostDetail from './Screens/PostDetail.js'
 import SearchScreen from './Screens/SearchScreen.js'
 import PostEditScreen from './Screens/PostEditScreen.js'
 import CreateChat from './Screens/CreateChat.js'
+import ChatListScreen from './Screens/ChatListScreen.js'
+import ListSearchScreen from './Screens/ListSearchScreen.js'
+
 
 import FirstScreen from './Screens/first.jsx'
 import FindIdScreen from './Screens/findId.jsx'
@@ -59,7 +62,7 @@ export default function App() {
     <WebSocketProvider>
       <MessageProvider>
       <NavigationContainer >
-        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="First" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Place" component={Place} />
           <Stack.Screen name="SignupScreen" component={SignupScreen} />
           <Stack.Screen name="Phone" component={Phone} />
@@ -84,6 +87,8 @@ export default function App() {
           <Stack.Screen name="SearchScreen" component={SearchScreen} />
           <Stack.Screen name="PostEditScreen" component={PostEditScreen} />
           <Stack.Screen name="CreateChat" component={CreateChat} />
+          <Stack.Screen name="ChatListScreen" component={ChatListScreen} />
+          <Stack.Screen name="ListSearchScreen" component={ListSearchScreen} />
 
 
           <Stack.Screen name="First" component={FirstScreen} />

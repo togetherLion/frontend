@@ -75,11 +75,11 @@ const Alarmlist = ({ navigation }) => {
       } else if (alarm.alarmType === 'CREATECHAT') {
         try {
             console.log("시도함");
-            console.log(alarm.connectId);
+            //console.log(alarm.connectId);
             const response = await axios.get(`http://192.168.200.116:8080/waitingdeal/check-chat-room/${alarm.connectId}`);
             //console.log(response.data);
-            console.log(response.data.roomId);
-            console.log(response.data.post.userId);
+            //console.log(response.data.roomId);
+            //console.log(response.data.post.userId);
             //console.log(response.data.roomId);
 
             navigation.navigate('ChatRoom', { 
@@ -110,7 +110,7 @@ const Alarmlist = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>알람 기록</Text>
+      <Text style={styles.header}>알림함</Text>
       <FlatList
         data={alarmData}
         renderItem={renderItem}
@@ -127,10 +127,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   header: {
+    marginTop: 15,
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: 'center',
+    //textAlign: 'center',
     color: '#333333',
   },
   card: {

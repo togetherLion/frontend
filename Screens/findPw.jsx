@@ -14,20 +14,17 @@ const FindPwScreen = ({ navigation }) => {
 
   const handleFindPw = async () => {
     try {
+        console.log(loginId);
       const response = await axios
-        .post('http://192.168.200.142:8080/user/findPw', {
-          loginId,
+        .post('http://192.168.200.116:8080/user/findPw', {
+          loginId : loginId,
         })
         .then((response) => {
-          if (response.status === 200) {
-            navigation.navigate('CompleteId')
-          } else {
-            Alert.alert(
-              '아이디 찾기 실패',
-              response.data.message || '아이디 찾기에 실패했습니다.'
-            )
+            console.log(response);
+            navigation.navigate('CompletePw');
+        
           }
-        })
+        )
     } catch (error) {
       Alert.alert('아이디 찾기 실패', error.message)
     }

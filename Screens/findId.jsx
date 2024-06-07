@@ -15,26 +15,22 @@ const FindIdScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('')
 
   const handleFindId = async () => {
+    //console.log(name);
     try {
-      const response = await axios
+      const resp = await axios
         .post('http://192.168.200.116:8080/user/findId', {
-          name,
-          phone,
+          name : name,
+          phone : phone,
         })
         .then((response) => {
-          console.log(response.status)
-          console.log(response.data.loginId)
+          console.log(resp);
+          //console.log(resp.data.loginId)
 
-          if (response.status === 200) {
+       
             navigation.navigate('CompleteId', {
               loginId: response.data.loginId,
             })
-          } else {
-            Alert.alert(
-              '아이디 찾기 실패',
-              response.data.message || '아이디 찾기에 실패했습니다.'
-            )
-          }
+        
         })
     } catch (error) {
       Alert.alert('아이디 찾기 실패', error.message)
@@ -77,7 +73,7 @@ const FindIdScreen = ({ navigation }) => {
           />
           <TouchableOpacity
             style={styles.findIdContentButton}
-            onPress={() => handleFindId}
+            onPress={handleFindId}
           >
             <Text style={styles.findIdContentText}>아이디 찾기</Text>
           </TouchableOpacity>

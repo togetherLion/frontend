@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, Text, ScrollView, TouchableOpacity, Keyboard, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, TextInput, StyleSheet, Text, ScrollView, TouchableOpacity, Keyboard, Image, Modal, Button } from 'react-native';
+import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome'; // FontAwesome 아이콘을 사용합니다.
 import axios from 'axios';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 
 const SearchScreen = ({ navigation, route }) => {
 
     const [userId, setUserId] = useState(route.params?.userId || '');
     const [searchText, setSearchText] = useState('');
-    const [recentSearches, setRecentSearches] = useState(['헌터헌터보고싶다', '샌드위치', '롯데리아', '오이김치', '오이김치']);
+    //const [recentSearches, setRecentSearches] = useState(['헌터헌터보고싶다', '샌드위치', '롯데리아', '오이김치', '오이김치']);
     const [popularSearches, setPopularSearches] = useState([
         { rank: '1.', term: '요아리', },
         { rank: '2.', term: '컴포즈커피' },
@@ -22,36 +23,97 @@ const SearchScreen = ({ navigation, route }) => {
         { rank: '9.', term: '빙수' },
         { rank: '10.', term: '빙수' }
     ]);
+    const [sortOption, setSortOption] = useState('이웃추가순'); // Default sorting option
+    const [modalVisible, setModalVisible] = useState(false);
+    const [emptySearchModalVisible, setEmptySearchModalVisible] = useState(false);
+    const [recentSearches, setRecentSearches] = useState([]);
+    const [priceModalVisible, setPriceModalVisible] = useState(false);
+    const [lowPrice, setLowPrice] = useState(0);
+    const [highPrice, setHighPrice] = useState(1000000);
 
-    useEffect(() => {
-        const fetchRecentSearches = async () => {
-            try {
-                const response = await axios.post('http://192.168.200.116:8080/posts/recentSearch');
-                setRecentSearches(response.data); // 최근 검색어 5개만 설정
-            } catch (error) {
-                console.error(error);
-            }
-        };
+    const handleSortChange = (option) => {
+        setSortOption(option);
+        setModalVisible(false);
+        //handleSearch();
+        if (option === '가격대설정') {
+            setPriceModalVisible(true);
+        }
 
-        fetchRecentSearches();
-    }, []);
-
-    const handleSearch = async () => {
-        if (searchText) {
-            try {
-                const response = await axios.get(`http://192.168.200.116:8080/posts/search/${searchText}`);
-                console.log(response.data); // 받은 데이터를 콘솔에 출력
-                setRecentSearches([...recentSearches, searchText]); // 최근 검색어에 추가
-                setSearchText(''); // 검색어 초기화
-                Keyboard.dismiss(); // 키보드 닫기
-
-                // 데이터를 다음 화면으로 전달
-                navigation.navigate('ListSearchScreen', { posts: response.data });
-            } catch (error) {
-                console.error(error); // 에러를 콘솔에 출력
-            }
+        else {
+            handleSearch();
         }
     };
+
+
+
+    const fetchRecentSearches = async () => {
+        try {
+            const response = await axios.post('http://192.168.200.116:8080/posts/recentSearch');
+            setRecentSearches(response.data); // 최근 검색어 5개만 설정
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchRecentSearches();
+        }, [])
+    );
+
+
+
+    const handleSearch = async () => {
+
+        if (!searchText) {
+            setEmptySearchModalVisible(true);
+            return;
+        }
+
+
+
+        let url = `http://192.168.200.116:8080/posts/search/${searchText}`;
+
+        if (sortOption === '저가순') {
+            url = `http://192.168.200.116:8080/posts/search/low/${searchText}`;
+        } else if (sortOption === '고가순') {
+            url = `http://192.168.200.116:8080/posts/search/high/${searchText}`;
+        } else if (sortOption === '최신순') {
+            url = `http://192.168.200.116:8080/posts/search/${searchText}`;
+        } else if (sortOption === '가격대설정') {
+            url = `http://192.168.200.116:8080 /posts/search/${searchText}/${lowPrice}/${highPrice}`;
+        }
+
+        try {
+            const response = await axios.get(url);
+            console.log(response.data); // 받은 데이터를 콘솔에 출력
+            setRecentSearches([searchText]); // 최근 검색어에 추가
+            setSearchText(''); // 검색어 초기화
+            Keyboard.dismiss(); // 키보드 닫기
+
+            // 데이터를 다음 화면으로 전달
+            navigation.navigate('ListSearchScreen', { posts: response.data, searchText: searchText });
+        } catch (error) {
+            console.error(error); // 에러를 콘솔에 출력
+        }
+    };
+
+    const handleSearch2 = async (searchTerm) => {
+        // 사용할 검색어로 searchTerm을 직접 사용
+        let url = `http://192.168.200.116:8080/posts/search/${searchTerm}`;
+
+        try {
+            const response = await axios.get(url);
+            console.log(response.data); // 받은 데이터를 콘솔에 출력
+            setSearchText(''); // 검색어 초기화 (필요한 경우에만)
+
+            // 데이터를 다음 화면으로 전달하며 네비게이트
+            navigation.navigate('ListSearchScreen', { posts: response.data, searchText: searchTerm });
+        } catch (error) {
+            console.error(error); // 에러를 콘솔에 출력
+        }
+    };
+
 
 
 
@@ -71,7 +133,41 @@ const SearchScreen = ({ navigation, route }) => {
     };
 
 
+    const handleRecentSearch = (item) => {
+        setSearchText(item);
+        handleSearch();
+    };
 
+    const handleRecentSearchPress = (item) => {
+        console.log(item);
+        handleSearch2(item); // handleSearch2에 item 값을 직접 전달
+    };
+
+    const handleSearch3 = async (lowPrice, highPrice) => {
+        if (!searchText) {
+            setEmptySearchModalVisible(true);
+            return;
+        }
+
+        let url = `http://192.168.200.116:8080/posts/search/${searchText}`;
+
+        if (sortOption === '가격대설정') {
+            url = `http://192.168.200.116:8080/posts/search/${searchText}/${lowPrice}/${highPrice}`;
+        }
+
+        try {
+            const response = await axios.get(url);
+            console.log(response.data); // 받은 데이터를 콘솔에 출력
+            setRecentSearches([searchText]); // 최근 검색어에 추가
+            setSearchText(''); // 검색어 초기화
+            Keyboard.dismiss(); // 키보드 닫기
+
+            // 데이터를 다음 화면으로 전달
+            navigation.navigate('ListSearchScreen', { posts: response.data, searchText: searchText });
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
 
     const half = Math.ceil(popularSearches.length / 2);
@@ -96,22 +192,105 @@ const SearchScreen = ({ navigation, route }) => {
                         style={styles.searchInput}
                         placeholder="검색어를 입력해주세요"
                         value={searchText}
-                        onChangeText={setSearchText} // 입력 값을 searchText 상태에 저장
-                        onSubmitEditing={handleSearch} // 엔터 키를 눌렀을 때 검색 수행
+                        onChangeText={setSearchText}
+                        onSubmitEditing={handleSearch}
                     />
+                    <TouchableOpacity onPress={() => setModalVisible(true)}>
+                        <Icon name="sort" size={20} color="#000" style={styles.icon} />
+                    </TouchableOpacity>
+
+
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            setModalVisible(!modalVisible);
+                        }}
+                    >
+                        <View style={styles.modalContainernew}>
+                            <View style={styles.modalViewnew}>
+                                <Text style={styles.modalTitlenew}>정렬선택</Text>
+                                {['최신순', '고가순', '저가순', '가격대설정'].map((option) => (
+                                    <TouchableOpacity key={option} onPress={() => handleSortChange(option)}>
+                                        <Text style={styles.modalTextnew}>{option}</Text>
+                                    </TouchableOpacity>
+                                ))}
+
+
+                                {/* <Button style={{ color: '#000' }}title="취소" onPress={() => setModalVisible(false)} /> */}
+
+                                <TouchableOpacity onPress={() => setModalVisible(false)} style={{ backgroundColor: '#FFF', padding: 10, borderRadius: 5 }}>
+                                    <Text style={{ color: '#000', fontSize: 15 }}>취소</Text>
+                                </TouchableOpacity>
+
+                            </View>
+                        </View>
+                    </Modal>
+
+
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={priceModalVisible}
+                        onRequestClose={() => setPriceModalVisible(!priceModalVisible)}
+                    >
+                        <View style={styles.modalContainer}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalTitle}>가격대 설정</Text>
+                                <Text>최저 가격: {lowPrice}원</Text>
+                                <Slider
+                                    style={{ width: 300, height: 40 }}
+                                    minimumValue={0}
+                                    maximumValue={99999}
+                                    step={10000}
+                                    value={lowPrice}
+                                    onValueChange={setLowPrice}
+                                    minimumTrackTintColor='#ffcc80'
+                                    maximumTrackTintColor="#000000"
+                                />
+                                <Text>최고 가격: {highPrice}원</Text>
+                                <Slider
+                                    style={{ width: 300, height: 40 }}
+                                    minimumValue={100000}
+                                    maximumValue={500000}
+                                    step={10000}
+                                    value={highPrice}
+                                    onValueChange={setHighPrice}
+                                    minimumTrackTintColor='#ffcc80'
+                                    maximumTrackTintColor="#000000"
+                                />
+
+
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                                    <TouchableOpacity onPress={() => {
+                                        setPriceModalVisible(false);
+                                        handleSearch3(lowPrice, highPrice);
+                                    }} style={{ backgroundColor: '#FFF', padding: 10, borderRadius: 5 }}>
+                                        <Text style={{ color: '#000', fontSize: 18 }}>확인</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => setPriceModalVisible(false)} style={{ backgroundColor: '#FFF', padding: 10, borderRadius: 5 }}>
+                                        <Text style={{ color: '#000', fontSize: 18 }}>취소</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+
+                            </View>
+                        </View>
+                    </Modal>
+
                 </View>
 
-                <Text style={styles.recentSearchLabel}>최근검색어</Text>
-                <ScrollView horizontal style={styles.recentSearchContainer}>
-                    {recentSearches.map((item, index) => (
-                        <View key={index} style={styles.recentSearchItem}>
-                            <Text style={styles.recentSearchText}>{item}</Text>
-                            <TouchableOpacity onPress={() => clearSearch()}>
-                                {/* <Text style={styles.clearButton}>X</Text> */}
+                <View>
+                    <Text style={styles.recentSearchLabel}>최근검색어</Text>
+                    <ScrollView horizontal style={styles.recentSearchContainer}>
+                        {recentSearches.map((item, index) => (
+                            <TouchableOpacity key={index} onPress={() => handleRecentSearchPress(item)} style={styles.recentSearchItem}>
+                                <Text style={styles.recentSearchText}>{item}</Text>
                             </TouchableOpacity>
-                        </View>
-                    ))}
-                </ScrollView>
+                        ))}
+                    </ScrollView>
+                </View>
 
                 {/* Gray divider line */}
                 <View style={styles.divider}></View>
@@ -156,7 +335,6 @@ const SearchScreen = ({ navigation, route }) => {
 
                 </View>
             </View>
-
             <View style={styles.bottomBar}>
                 <TouchableOpacity onPress={() => navigation.navigate('PostListScreen', { userId: userId })} style={styles.bottomBarItem}>
                     <MaterialIcons name="home" size={24} color="#bbb" />
@@ -164,15 +342,32 @@ const SearchScreen = ({ navigation, route }) => {
                 <TouchableOpacity onPress={() => navigation.navigate('SearchScreen', { userId: userId })} style={styles.bottomBarItem}>
                     <MaterialIcons name="search" size={24} color="#bbb" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomBarItem}>
+                <TouchableOpacity onPress={() => navigation.navigate('ChatListScreen', { userId: userId })} style={styles.bottomBarItem}>
                     <MaterialIcons name="chat" size={24} color="#bbb" />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('MyPage', { userId: userId })} style={styles.bottomBarItem}>
                     <MaterialIcons name="person" size={24} color="#bbb" />
                 </TouchableOpacity>
             </View>
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={emptySearchModalVisible}
+                onRequestClose={() => setEmptySearchModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalTitle}>검색어를 입력하세요</Text>
+
+                        <TouchableOpacity onPress={() => setEmptySearchModalVisible(false)} style={{ backgroundColor: '#FFF', padding: 10, borderRadius: 5 }}>
+                            <Text style={{ color: '#000' }}>확인</Text>
+                        </TouchableOpacity>
 
 
+                        {/* <Button title="확인" onPress={() => setEmptySearchModalVisible(false)} /> */}
+                    </View>
+                </View>
+            </Modal>
 
         </View>
 
@@ -215,6 +410,95 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
 
+
+
+
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+
+    },
+
+    modalTitle: {
+        marginBottom: 30,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 25,
+    },
+
+
+    modalText: {
+        marginBottom: 10,
+        textAlign: 'center',
+        //color: 'black',
+    },
+
+
+
+
+
+
+
+    modalContainernew: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    modalViewnew: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+
+    },
+
+    modalTitlenew: {
+        marginBottom: 30,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 25,
+        //color : '#ffcc80',
+    },
+
+
+    modalTextnew: {
+
+        marginBottom: 15,
+        textAlign: 'right',
+        fontSize: 18,
+    },
+
+
+
+
+
     recentSearchLabel: {   //최근검색어
         fontSize: 25, // Adjust the font size as desired
         fontWeight: 'bold',
@@ -254,6 +538,8 @@ const styles = StyleSheet.create({
         marginVertical: 13,
         marginBottom: 20,
     },
+
+
     popularSearchContainer: {
         backgroundColor: 'white',
         padding: 10,
@@ -311,6 +597,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#333',
     },
+
     bottomBar: {
         flexDirection: 'row',
         justifyContent: 'space-around',
@@ -324,11 +611,14 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
     },
+
     bottomBarItem: {
         flex: 1,
         alignItems: 'center',
         color: '#ffcc80',
     },
+
+
 
 });
 

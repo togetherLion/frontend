@@ -44,25 +44,30 @@ const ChatRoomScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const initialize = async () => {
-      await getAccount()
-      await getNickname()
-      await getRecommend()
+      try {
+        await getAccount()
+        await getNickname()
+        await getRecommend()
 
-      if (!connected) {
-        websocketDispatch({
-          type: 'CONNECT',
-          payload: 'ws://192.168.200.116:8080/ws/chat',
-        })
+        if (!connected) {
+          websocketDispatch({
+            type: 'CONNECT',
+            payload: 'ws://192.168.200.116:8080/ws/chat',
+          });
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
       }
-    }
-
+    };
     initialize()
 
     const handleOpen = () => {
+      console.log('WebSocket connection opened');
       sendEnterMessage()
     }
 
     const handleMessage = (message) => {
+      console.log('Received message:', message);
       messageDispatch({
         type: 'ADD_MESSAGE',
         roomId: route.params.roomId,
@@ -70,14 +75,30 @@ const ChatRoomScreen = ({ navigation, route }) => {
       })
     }
 
-    WebSocketManager.on('open', handleOpen)
-    WebSocketManager.on('message', handleMessage)
+    const handleError = (error) => {
+      console.error('WebSocket error:', error);
+    }
+
+    const handleClose = (code, reason) => {
+      console.log(`WebSocket connection closed with code ${code} and reason ${reason}`);
+    }
+
+    if (WebSocketManager) {
+      WebSocketManager.on('open', handleOpen);
+      WebSocketManager.on('message', handleMessage);
+      WebSocketManager.on('error', handleError);
+      WebSocketManager.on('close', handleClose);
+    }
 
     return () => {
-      WebSocketManager.off('open', handleOpen)
-      WebSocketManager.off('message', handleMessage)
+      if (WebSocketManager) {
+        WebSocketManager.off('open', handleOpen);
+        WebSocketManager.off('message', handleMessage);
+        WebSocketManager.off('error', handleError);
+        WebSocketManager.off('close', handleClose);
+      }
     }
-  }, [connected, nickname]) // Add nickname as a dependency
+  }, [connected, nickname]);
 
   const getNickname = async () => {
     try {
@@ -184,342 +205,344 @@ const ChatRoomScreen = ({ navigation, route }) => {
     Linking.openURL(url).catch((err) => console.error('An error occurred', err))
   }
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>X</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chat Room</Text>
-      </View>
-      <FlatList
-        data={messages}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.messageContainer}>
-            <Text style={styles.messageSender}>{item.sender}</Text>
-            <Text style={styles.messageText}>{item.message.split('\n').map((line, index) => (
-                <Text key={index}>
-                  {line.includes('https://www.google.com/maps/search') ? (
-                    <Text
-                      style={styles.linkText}
-                      onPress={() => Linking.openURL(line)}
-                    >
-                      {line}
-                    </Text>
-                  ) : (
-                    <Text>{line}</Text>
-                  )}
-                  {'\n'}
-                </Text>
-              ))}</Text>
-          </View>
-        )}
-        contentContainerStyle={styles.messageList}
-      />
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.closeButtonText}>X</Text>
-            </TouchableOpacity>
-            <View style={styles.modalContent}>
-            <TouchableOpacity
-                    style={styles.modalItem}
-                    onPress={() => {
-                      setModalVisible(false)
-                      navigation.navigate('Progress', {
-                        postId: postId,
-                        userId: userId,
-                        postUserId : postUserId
-                      })
-                    }}
-                  >
-                    <Image
-                      source={require('../assets/images/Icon/manage.png')}
-                      style={styles.modalIcon}
-                    />
-                    <Text>진행 상황</Text>
-                  </TouchableOpacity>
-              {userId === route.params.postUserId /*현재 post의 userId로 바꾸기*/ ? (
-                <>
-                  <TouchableOpacity
-                    style={styles.modalItem}
-                    onPress={sendAccount}
-                  >
-                    <Image
-                      source={require('../assets/images/Icon/account.png')}
-                      style={styles.modalIcon}
-                    />
-                    <Text>계좌 보내기</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={styles.modalItem}
-                    onPress={() => {
-                      setModalVisible(false)
-                      setRecModalVisible(true)
-                    }}
-                  >
-                    <Image
-                      source={require('../assets/images/Icon/location.png')}
-                      style={styles.modalIcon}
-                    />
-                    <Text>장소 추천</Text>
-                  </TouchableOpacity>
-                </>
-              ) : null
-             }
-            </View>
-          </View>
-        </View>
-      </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={recModalVisible}
-        onRequestClose={() => setRecModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>거래 장소 추천</Text>
-            {recommendations.map((item, index) => (
-              <View key={index} style={styles.item}>
-                <Checkbox
-                  value={selected === index}
-                  onValueChange={() => handleCheckboxClick(index)}
-                />
-                <Text style={styles.itemText}> {item.placeName}</Text>
+
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
                 <TouchableOpacity
-                  style={styles.viewLocationButton}
-                  onPress={() =>
-                    handleViewLocation(item.placeLat, item.placeLong)
-                  }
+                    onPress={() => navigation.goBack()}
+                    style={styles.backButton}
                 >
-                  <Text style={styles.viewLocationText}>위치 보기</Text>
+                    <Text style={styles.backButtonText}>X</Text>
                 </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        </View>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={recSubModalVisible}
-          onRequestClose={handleCancel}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>이 장소로 하시겠습니까?</Text>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={sendRecommend}>
-                  <Text style={styles.buttonText}>확인</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={handleCancel}>
-                  <Text style={styles.buttonText}>취소</Text>
-                </TouchableOpacity>
-              </View>
+                <Text style={styles.headerTitle}>Chat Room</Text>
             </View>
-          </View>
-        </Modal>
-      </Modal>
-      <View style={styles.inputRow}>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          value={inputMessage}
-          onChangeText={setInputMessage}
-          placeholder="메시지를 입력하세요"
-        />
-        <Button title="Send" onPress={sendMessage} />
-      </View>
-    </SafeAreaView>
-  )
+            <FlatList
+                data={messages}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <View style={styles.messageContainer}>
+                        <Text style={styles.messageSender}>{item.sender}</Text>
+                        <Text style={styles.messageText}>{item.message.split('\n').map((line, index) => (
+                            <Text key={index}>
+                                {line.includes('https://www.google.com/maps/search') ? (
+                                    <Text
+                                        style={styles.linkText}
+                                        onPress={() => Linking.openURL(line)}
+                                    >
+                                        {line}
+                                    </Text>
+                                ) : (
+                                    <Text>{line}</Text>
+                                )}
+                                {'\n'}
+                            </Text>
+                        ))}</Text>
+                    </View>
+                )}
+                contentContainerStyle={styles.messageList}
+            />
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => setModalVisible(false)}
+                        >
+                            <Text style={styles.closeButtonText}>X</Text>
+                        </TouchableOpacity>
+                        <View style={styles.modalContent}>
+                            <TouchableOpacity
+                                style={styles.modalItem}
+                                onPress={() => {
+                                    setModalVisible(false)
+                                    navigation.navigate('Progress', {
+                                        postId: postId,
+                                        userId: userId,
+                                        postUserId: postUserId
+                                    })
+                                }}
+                            >
+                                <Image
+                                    source={require('../assets/images/Icon/manage.png')}
+                                    style={styles.modalIcon}
+                                />
+                                <Text>진행 상황</Text>
+                            </TouchableOpacity>
+                            {userId === route.params.postUserId /*현재 post의 userId로 바꾸기*/ ? (
+                                <>
+                                    <TouchableOpacity
+                                        style={styles.modalItem}
+                                        onPress={sendAccount}
+                                    >
+                                        <Image
+                                            source={require('../assets/images/Icon/account.png')}
+                                            style={styles.modalIcon}
+                                        />
+                                        <Text>계좌 보내기</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        style={styles.modalItem}
+                                        onPress={() => {
+                                            setModalVisible(false)
+                                            setRecModalVisible(true)
+                                        }}
+                                    >
+                                        <Image
+                                            source={require('../assets/images/Icon/location.png')}
+                                            style={styles.modalIcon}
+                                        />
+                                        <Text>장소 추천</Text>
+                                    </TouchableOpacity>
+                                </>
+                            ) : null
+                            }
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={recModalVisible}
+                onRequestClose={() => setRecModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>거래 장소 추천</Text>
+                        {recommendations.map((item, index) => (
+                            <View key={index} style={styles.item}>
+                                <Checkbox
+                                    value={selected === index}
+                                    onValueChange={() => handleCheckboxClick(index)}
+                                />
+                                <Text style={styles.itemText}> {item.placeName}</Text>
+                                <TouchableOpacity
+                                    style={styles.viewLocationButton}
+                                    onPress={() =>
+                                        handleViewLocation(item.placeLat, item.placeLong)
+                                    }
+                                >
+                                    <Text style={styles.viewLocationText}>위치 보기</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={recSubModalVisible}
+                    onRequestClose={handleCancel}
+                >
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>이 장소로 하시겠습니까?</Text>
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity style={styles.button} onPress={sendRecommend}>
+                                    <Text style={styles.buttonText}>확인</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.button} onPress={handleCancel}>
+                                    <Text style={styles.buttonText}>취소</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </Modal>
+            <View style={styles.inputRow}>
+                <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => setModalVisible(true)}
+                >
+                    <Text style={styles.addButtonText}>+</Text>
+                </TouchableOpacity>
+                <TextInput
+                    style={styles.input}
+                    value={inputMessage}
+                    onChangeText={setInputMessage}
+                    placeholder="메시지를 입력하세요"
+                />
+                <Button title="Send" onPress={sendMessage} />
+            </View>
+        </SafeAreaView>
+    )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F4C089',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  backButton: {
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    padding: 10,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#F4C089',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  messageList: {
-    padding: 10,
-  },
-  messageContainer: {
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-  },
-  messageSender: {
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  messageText: {
-    fontSize: 16,
-  },
-  addButton: {
-    backgroundColor: '#fff',
-    borderRadius: 50,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  addButtonText: {
-    color: '#F4C089',
-    fontSize: 24,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-  },
-  closeButton: {
-    alignSelf: 'flex-end',
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: '#000',
-  },
-  modalContent: {
-    marginTop: 20,
-  },
-  modalItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalIcon: {
-    width: 30,
-    height: 30,
-    marginRight: 10,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    backgroundColor: '#fff',
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  itemText: {
-    flex: 1,
-    fontSize: 16,
-  },
-  viewLocationButton: {
-    padding: 10,
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-  },
-  viewLocationText: {
-    color: '#fff',
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalView: {
-    width: 300,
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  button: {
-    flex: 1,
-    marginHorizontal: 10,
-    padding: 10,
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#F4C089',
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 10,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+    backButton: {
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        padding: 10,
+    },
+    backButtonText: {
+        fontSize: 16,
+        color: '#F4C089',
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    messageList: {
+        padding: 10,
+    },
+    messageContainer: {
+        marginBottom: 10,
+        padding: 10,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 2,
+    },
+    messageSender: {
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    messageText: {
+        fontSize: 16,
+    },
+    addButton: {
+        backgroundColor: '#fff',
+        borderRadius: 50,
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    addButtonText: {
+        color: '#F4C089',
+        fontSize: 24,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+        width: '80%',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 20,
+    },
+    closeButton: {
+        alignSelf: 'flex-end',
+    },
+    closeButtonText: {
+        fontSize: 18,
+        color: '#000',
+    },
+    modalContent: {
+        marginTop: 20,
+    },
+    modalItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    modalIcon: {
+        width: 30,
+        height: 30,
+        marginRight: 10,
+    },
+    inputRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+        padding: 10,
+        backgroundColor: '#fff',
+    },
+    input: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 5,
+        padding: 10,
+        marginRight: 10,
+        backgroundColor: '#fff',
+    },
+    item: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    itemText: {
+        flex: 1,
+        fontSize: 16,
+    },
+    viewLocationButton: {
+        padding: 10,
+        backgroundColor: '#007bff',
+        borderRadius: 5,
+    },
+    viewLocationText: {
+        color: '#fff',
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalView: {
+        width: 300,
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalText: {
+        fontSize: 18,
+        marginBottom: 20,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    button: {
+        flex: 1,
+        marginHorizontal: 10,
+        padding: 10,
+        backgroundColor: '#007bff',
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
 })
 
 export default ChatRoomScreen

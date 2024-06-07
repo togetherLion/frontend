@@ -18,7 +18,7 @@ const FirstScreen = ({ navigation }) => {
       <View style={styles.bottomContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('ChatButton')}
+          onPress={() => navigation.navigate('Phone')}
         >
           <Text style={styles.buttonText}>시작하기</Text>
         </TouchableOpacity>

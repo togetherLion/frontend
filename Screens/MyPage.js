@@ -247,20 +247,19 @@ const MyPage = ({ navigation, route }) => {
       </ScrollView>
 
       <View style={styles.bottomBar}>
-        <TouchableOpacity onPress={() => navigation.navigate('PostListScreen', { userId: userId })} style={styles.bottomBarItem}>
-          <MaterialIcons name="home" size={24} color="#bbb" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('SearchScreen', { userId: userId })} style={styles.bottomBarItem}>
-          <MaterialIcons name="search" size={24} color="#bbb" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomBarItem}>
-          <MaterialIcons name="chat" size={24} color="#bbb" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('MyPage', { userId: userId })} style={styles.bottomBarItem}>
-          <MaterialIcons name="person" size={24} color="#bbb" />
-        </TouchableOpacity>
-      </View>
-
+                <TouchableOpacity onPress={() => navigation.navigate('PostListScreen', { userId: userId })}style={styles.bottomBarItem}>
+                    <MaterialIcons name="home" size={24} color="#bbb" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('SearchScreen', { userId: userId })} style={styles.bottomBarItem}>
+                    <MaterialIcons name="search" size={24} color="#bbb" />
+                </TouchableOpacity>
+                <TouchableOpacity  onPress={() => navigation.navigate('ChatListScreen', { userId: userId })} style={styles.bottomBarItem}>
+                    <MaterialIcons name="chat" size={24} color="#bbb" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('MyPage', { userId: userId })} style={styles.bottomBarItem}>
+                    <MaterialIcons name="person" size={24} color="#bbb" />
+                </TouchableOpacity>
+            </View>
 
 
     </View>

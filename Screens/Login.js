@@ -29,10 +29,11 @@ const Login = ({ navigation }) => {
                     const userId = resp.data.userId || '';
                     navigation.navigate('PostListScreen', { userId: userId });
                 }
-            }).catch(function (err) {
-                Alert.alert("로그인 실패", "아이디나 비밀번호를 확인하세요.");
-                console.log(`에러 메시지: ${err}`);
-            });
+            }).catch(error => {
+                console.log(error.response.data.error);
+                setModalMessage(error.response.data.error);
+                setModalVisible(true);
+              });
         }
     }
 
@@ -57,10 +58,10 @@ const Login = ({ navigation }) => {
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                 <Text style={styles.loginButtonText}>로그인</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { }}>
+            <TouchableOpacity onPress={() => {navigation.navigate('FindId') }}>
                 <Text style={styles.link}>아이디를 잊으셨나요?</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { }}>
+            <TouchableOpacity onPress={() => {navigation.navigate('FindPw') }}>
                 <Text style={styles.link}>비밀번호를 잊으셨나요?</Text>
             </TouchableOpacity>
             <View style={styles.footer}>
