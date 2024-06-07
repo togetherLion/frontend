@@ -42,9 +42,9 @@ const MyPage = ({ navigation, route }) => {
   async function getMyPage() {
     try {
       const responses = await Promise.all([
-        axios.post("http://192.168.200.116:8080/user/userProfile", { userId: userId }),
-        axios.get("http://192.168.200.116:8080/posts/my"),
-        axios.get("http://192.168.200.116:8080/goods/liked"),
+        axios.post("http://127.0.0.1:8080/user/userProfile", { userId: userId }),
+        axios.get("http://127.0.0.1:8080/posts/my"),
+        axios.get("http://127.0.0.1:8080/goods/liked"),
       ]);
 
       const [resp1, resp2, resp3] = responses;
@@ -95,7 +95,7 @@ const MyPage = ({ navigation, route }) => {
   };
 
   const confirmLogout = () => {
-    axios.post("http://192.168.200.116:8080/user/logout")
+    axios.post("http://127.0.0.1:8080/user/logout")
       .then((resp) => {
         console.log(resp.data);
         if (resp.data !== null && resp.data !== "") {

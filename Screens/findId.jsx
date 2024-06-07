@@ -17,7 +17,7 @@ const FindIdScreen = ({ navigation }) => {
   const handleFindId = async () => {
     try {
       const response = await axios
-        .post('http://192.168.200.116:8080/user/findId', {
+        .post('http://127.0.0.1:8080/user/findId', {
           name,
           phone,
         })

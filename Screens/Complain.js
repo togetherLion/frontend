@@ -40,7 +40,7 @@ const Complain = ({ navigation, route }) => {
           selectedCategory = complainCategories[selectedReason];
         }
 
-        const response = await axios.post('http://192.168.200.116:8080/complain', {
+        const response = await axios.post('http://127.0.0.1:8080/complain', {
           complainCategory: selectedCategory,
           complainContent: otherReason,
           targetUserId: userId

@@ -19,7 +19,7 @@ const Login = ({ navigation }) => {
             setModalMessage('비밀번호가 입력되지 않았습니다.');
             setModalVisible(true);
         } else {
-            axios.post("http://192.168.200.116:8080/user/login", {
+            axios.post("http://127.0.0.1:8080/user/login", {
                 loginId: loginId,
                 password: password,
             }).then(function (resp) {

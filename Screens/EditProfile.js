@@ -41,7 +41,7 @@ const EditProfile = ({ navigation, route }) => {
 
     const saveProfile = async () => {
         try {
-            const resp = await axios.post("http://192.168.219.45:8080/user/modifyProfile", {
+            const resp = await axios.post("http://127.0.0.1:8080/user/modifyProfile", {
                 userId: 15,
                 nickname: nickname,
                 profileIntro: profileIntro,

@@ -12,7 +12,7 @@ const Follower = ({route}) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get(`http://192.168.200.116:8080/user/follower/${userId}`);
+                const response = await axios.get(`http://127.0.0.1:8080/user/follower/${userId}`);
                 setUserData(response.data);
                 console.log(response.data);
             } catch (error) {

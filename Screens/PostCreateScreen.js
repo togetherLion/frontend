@@ -10,7 +10,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImageManipulator from 'expo-image-manipulator';
 
 
-const SERVER_URL = 'http://192.168.200.116:8080/posts';
+const SERVER_URL = 'http://127.0.0.1:8080/posts';
 
 const PostCreateScreen = ({ navigation }) => {
   const [photo, setPhoto] = useState(null);
@@ -109,7 +109,7 @@ const PostCreateScreen = ({ navigation }) => {
     }
 
     else {
-      axios.post("http://192.168.200.116:8080/posts", {
+      axios.post("http://127.0.0.1:8080/posts", {
         productName: productName,
         productContent: productContent,
         dealNum: dealNum,

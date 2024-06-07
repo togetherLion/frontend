@@ -26,7 +26,7 @@ const SearchScreen = ({ navigation, route }) => {
     useEffect(() => {
         const fetchRecentSearches = async () => {
             try {
-                const response = await axios.post('http://192.168.200.116:8080/posts/recentSearch');
+                const response = await axios.post('http://127.0.0.1:8080/posts/recentSearch');
                 setRecentSearches(response.data); // 최근 검색어 5개만 설정
             } catch (error) {
                 console.error(error);
@@ -39,7 +39,7 @@ const SearchScreen = ({ navigation, route }) => {
     const handleSearch = async () => {
         if (searchText) {
             try {
-                const response = await axios.get(`http://192.168.200.116:8080/posts/search/${searchText}`);
+                const response = await axios.get(`http://127.0.0.1:8080/posts/search/${searchText}`);
                 console.log(response.data); // 받은 데이터를 콘솔에 출력
                 setRecentSearches([...recentSearches, searchText]); // 최근 검색어에 추가
                 setSearchText(''); // 검색어 초기화

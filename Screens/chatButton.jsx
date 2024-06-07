@@ -17,14 +17,15 @@ const ChatButtonScreen = ({ navigation, route }) => {
   const [chatRoomExists, setChatRoomExists] = useState(false) // State to hold the result of checkChatRoom
   const [chatUserData, setChatUserData] = useState([])
   const userId = route.params.userId
-  const postId = 1
+  const postId = route.params.postId
+  const postUserId = route.params.postUserId
 
   useFocusEffect(
     useCallback(() => {
       const checkChatRoom = async () => {
         try {
           const response = await axios.get(
-            'http://192.168.200.116:8080/waitingdeal/check-chat-room/1'
+            'http://127.0.0.1:8080/waitingdeal/check-chat-room/' + postId
           )
           if (response.data.roomId) {
             setChatRoomExists(true)
@@ -43,7 +44,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
   const checkCreateChat = async () => {
     try {
       const response = await axios.get(
-        'http://192.168.200.116:8080/waitingdeal/accepted-users?postId=1' /*+ 현재 postId로 바꾸기*/
+        'http://127.0.0.1:8080/waitingdeal/accepted-users?postId=' + postId/*+ 현재 postId로 바꾸기*/
       )
 
       const data = response.data
@@ -62,7 +63,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
   const createChat = async (postId, roomName) => {
     try {
       const response = await axios.post(
-        'http://192.168.200.116:8080/chat/check-and-create-room?' +
+        'http://127.0.0.1:8080/chat/check-and-create-room?' +
           'postId=' +
           postId +
           '&roomName=' +
@@ -71,8 +72,10 @@ const ChatButtonScreen = ({ navigation, route }) => {
 
       navigation.navigate('ChatRoom', {
         userId: userId,
+        postId: postId,
         roomId: response.data.roomId,
-        chatUserData: chatUserData,
+        postUserId : postUserId,
+        // chatUserData: chatUserData,
       })
     } catch (error) {
       console.error('Error createChat:', error)
@@ -82,11 +85,13 @@ const ChatButtonScreen = ({ navigation, route }) => {
   const joinChatRoom = async () => {
     try {
       const response = await axios.get(
-        'http://192.168.200.116:8080/waitingdeal/check-chat-room/1'
+        'http://127.0.0.1:8080/waitingdeal/check-chat-room/' + postId
       )
       navigation.navigate('ChatRoom', {
         userId: userId,
+        postId: postId,
         roomId: response.data.roomId,
+        postUserId : route.params.postUserId,
       })
     } catch (error) {
       console.error('Error joinChatRoom:', error)
@@ -95,8 +100,8 @@ const ChatButtonScreen = ({ navigation, route }) => {
 
   const sendWaiting = async () => {
     try {
-      await axios.post('http://192.168.200.116:8080/waitingdeal', {
-        postId: 1, // 현재 postId로 바꾸기
+      await axios.post('http://127.0.0.1:8080/waitingdeal', {
+        postId: postId, // 현재 postId로 바꾸기
       })
       Alert.alert('참여가 요청되었습니다!')
     } catch (error) {
@@ -109,7 +114,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {userId === 1 /*현재 post의 userId로 바꾸기*/ ? (
+      {userId ===  postUserId /*현재 post의 userId로 바꾸기*/ ? (
         <>
           {chatRoomExists ? (
             <TouchableOpacity style={styles.button} onPress={joinChatRoom}>
@@ -125,8 +130,9 @@ const ChatButtonScreen = ({ navigation, route }) => {
             style={styles.button}
             onPress={() =>
               navigation.navigate('WaitingTable', {
-                postId: /*현재 postId로 바꾸기*/ 1,
+                postId: /*현재 postId로 바꾸기*/ postId,
                 userId: userId,
+                postUserId: postUserId,
               })
             }
           >
@@ -138,7 +144,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
           <TouchableOpacity style={styles.button} onPress={sendWaiting}>
             <Text style={styles.buttonText}>참여하기</Text>
           </TouchableOpacity>
-
+          
           <TouchableOpacity style={styles.button} onPress={joinChatRoom}>
             <Text style={styles.buttonText}>채팅방 참가</Text>
           </TouchableOpacity>

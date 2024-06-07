@@ -12,7 +12,7 @@ const Alarmlist = ({ navigation }) => {
 
   const fetchAlarmData = async () => {
     try {
-      const response = await axios.get('http://192.168.200.116:8080/alarm/list');
+      const response = await axios.get('http://127.0.0.1:8080/alarm/list');
       const responseData = response.data.map(alarm => ({
         ...alarm,
         isRead: false // Initialize isRead as false
@@ -40,7 +40,7 @@ const Alarmlist = ({ navigation }) => {
   const markAlarmAsRead = async (alarmId) => {
     try {
       // POST 요청으로 변경하고 alarmId를 URL에 추가
-      await axios.post(`http://192.168.200.116:8080/alarm/check?alarmId=${alarmId}`);
+      await axios.post(`http://127.0.0.1:8080/alarm/check?alarmId=${alarmId}`);
     } catch (error) {
       console.error('Error marking alarm as read:', error.response ? error.response.data : error.message);
     }

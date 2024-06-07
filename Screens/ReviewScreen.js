@@ -9,7 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
-const SERVER_URL = 'http://192.168.200.116:8080/posts';
+const SERVER_URL = 'http://127.0.0.1:8080/posts';
 
 const ReviewScreen = ({ navigation }) => {
   const [photo, setPhoto] = useState(null);

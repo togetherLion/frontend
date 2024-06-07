@@ -23,6 +23,8 @@ import Checkbox from 'expo-checkbox'
 
 const ChatRoomScreen = ({ navigation, route }) => {
   const userId = route.params.userId
+  const postId = route.params.postId
+  const postUserId = route.params.postUserId
   const [nickname, setNickname] = useState('')
   const [account, setAccount] = useState('')
   const [cheatMsg, setCheatMsg] = useState('')
@@ -49,7 +51,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
       if (!connected) {
         websocketDispatch({
           type: 'CONNECT',
-          payload: 'ws://192.168.200.116:8080/ws/chat',
+          payload: 'ws://127.0.0.1:8080/ws/chat',
         })
       }
     }
@@ -80,7 +82,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
   const getNickname = async () => {
     try {
       const response = await axios.post(
-        'http://192.168.200.116:8080/user/userProfile',
+        'http://127.0.0.1:8080/user/userProfile',
         { userId: userId }
       )
       console.log(response.data.nickname)
@@ -116,7 +118,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
   const getAccount = async () => {
     try {
       const response = await axios.get(
-        'http://192.168.200.116:8080/chat/account'
+        'http://127.0.0.1:8080/chat/account'
       )
       setCheatMsg(response.data.cheatMsg)
       setAccount(response.data.account)
@@ -141,7 +143,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
   const getRecommend = async () => {
     try {
       const response = await axios.get(
-        'http://192.168.200.116:8080/chat/recommend?postId=1' /*+
+        'http://127.0.0.1:8080/chat/recommend?postId=' + route.params.postId /*+
           route.params.postId */
       )
       setRecommendations(response.data)
@@ -198,7 +200,21 @@ const ChatRoomScreen = ({ navigation, route }) => {
         renderItem={({ item }) => (
           <View style={styles.messageContainer}>
             <Text style={styles.messageSender}>{item.sender}</Text>
-            <Text style={styles.messageText}>{item.message}</Text>
+            <Text style={styles.messageText}>{item.message.split('\n').map((line, index) => (
+                <Text key={index}>
+                  {line.includes('https://www.google.com/maps/search') ? (
+                    <Text
+                      style={styles.linkText}
+                      onPress={() => Linking.openURL(line)}
+                    >
+                      {line}
+                    </Text>
+                  ) : (
+                    <Text>{line}</Text>
+                  )}
+                  {'\n'}
+                </Text>
+              ))}</Text>
           </View>
         )}
         contentContainerStyle={styles.messageList}
@@ -218,14 +234,24 @@ const ChatRoomScreen = ({ navigation, route }) => {
               <Text style={styles.closeButtonText}>X</Text>
             </TouchableOpacity>
             <View style={styles.modalContent}>
-              <TouchableOpacity style={styles.modalItem}>
-                <Image
-                  source={require('../assets/images/Icon/photo.png')}
-                  style={styles.modalIcon}
-                />
-                <Text>사진</Text>
-              </TouchableOpacity>
-              {userId === 1 /*현재 post의 userId로 바꾸기*/ ? (
+            <TouchableOpacity
+                    style={styles.modalItem}
+                    onPress={() => {
+                      setModalVisible(false)
+                      navigation.navigate('Progress', {
+                        postId: postId,
+                        userId: userId,
+                        postUserId : postUserId
+                      })
+                    }}
+                  >
+                    <Image
+                      source={require('../assets/images/Icon/manage.png')}
+                      style={styles.modalIcon}
+                    />
+                    <Text>진행 상황</Text>
+                  </TouchableOpacity>
+              {userId === route.params.postUserId /*현재 post의 userId로 바꾸기*/ ? (
                 <>
                   <TouchableOpacity
                     style={styles.modalItem}
@@ -237,29 +263,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
                     />
                     <Text>계좌 보내기</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.modalItem}>
-                    <Image
-                      source={require('../assets/images/Icon/exit.png')}
-                      style={styles.modalIcon}
-                    />
-                    <Text>강퇴</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.modalItem}
-                    onPress={() => {
-                      setModalVisible(false)
-                      navigation.navigate('Progress', {
-                        postId: route.params.postId,
-                        userId: route.params.userId,
-                      })
-                    }}
-                  >
-                    <Image
-                      source={require('../assets/images/Icon/manage.png')}
-                      style={styles.modalIcon}
-                    />
-                    <Text>진행 상황 관리</Text>
-                  </TouchableOpacity>
+                  
                   <TouchableOpacity
                     style={styles.modalItem}
                     onPress={() => {
@@ -274,22 +278,8 @@ const ChatRoomScreen = ({ navigation, route }) => {
                     <Text>장소 추천</Text>
                   </TouchableOpacity>
                 </>
-              ) : (
-                <TouchableOpacity style={styles.modalItem}>
-                  <Image
-                    source={require('../assets/images/Icon/review.png')}
-                    style={styles.modalIcon}
-                  />
-                  <Text>후기 등록</Text>
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity style={styles.modalItem}>
-                <Image
-                  source={require('../assets/images/Icon/exit-chat.png')}
-                  style={styles.modalIcon}
-                />
-                <Text>채팅방 나가기</Text>
-              </TouchableOpacity>
+              ) : null
+             }
             </View>
           </View>
         </View>

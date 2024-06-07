@@ -16,7 +16,7 @@ const Phone = ({ navigation }) => {
           setModalMessage('번호가 입력되지 않았습니다.');
           setModalVisible(true);
         } else {
-          axios.post("http://192.168.200.116:8080/user/phoneAuth", { phone: phone })
+          axios.post("http://127.0.0.1:8080/user/phoneAuth", { phone: phone })
             .then(function (response) {
               console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
               if (response.data.auth !== undefined && response.data.auth !== null) {

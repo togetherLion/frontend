@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -9,13 +9,13 @@ import {
 import Checkbox from 'expo-checkbox'
 import axios from 'axios'
 
-let i = 0
-
 const steps = ['모집', '송금', '상품 배송', '상품 전달']
 
 const ProgressScreen = ({ navigation, route }) => {
-  const [chatRoomId, setChatRoomId] = useState('')
+  const [postUserId, setPostUserId] = useState('')
   const [chatStatus, setChatStatus] = useState('')
+  const postId = route.params.postId
+  const userId = route.params.userId
 
   const [stepStatus, setStepStatus] = useState([
     '진행중',
@@ -23,39 +23,24 @@ const ProgressScreen = ({ navigation, route }) => {
   ])
 
   useEffect(() => {
-    // 이 부분에서 axios를 사용하여 chatid와 chatstatus를 받아옵니다.
-    // 예시로 아래와 같이 구현할 수 있습니다. 실제로 사용할 때는 서버와의 통신이 이루어져야 합니다.
     const fetchChatStatus = async () => {
       try {
-        const response = await axios
-          .get('http://192.168.200.116:8080/posts/1' /*+ route.params.postId*/)
-          .then((response) => {
-            setChatStatus(response.data.dealState)
-            updateProgress(response.data.dealState)
-          })
+        const response = await axios.get(
+          'http://127.0.0.1:8080/posts/' + postId /*+ route.params.postId*/
+        )
+        setPostUserId(response.data.post.userId)
+        setChatStatus(response.data.post.dealState)
+        updateProgress(response.data.post.dealState)
       } catch (error) {
         console.error('Error fetching chat status:', error)
       }
     }
 
-    fetchChatStatus() // 컴포넌트가 마운트될 때 chatstatus를 받아옵니다.
-
-    // chatid나 chatstatus가 변경될 때마다 chatstatus를 업데이트합니다.
-  }, [chatRoomId, chatStatus])
+    fetchChatStatus()
+  }, [])
 
   const updateProgress = (chatStatus) => {
-    // let i = 0
     const newStatus = [...stepStatus]
-    // for (i = 0; i < (chatStatus + 1) / 4; i++) {
-    //   newStatus[i] = '진행완료'
-    // }
-    // if ((chatStatus + 1) % 3 == 1) {
-    //   newStatus[i] = '대기'
-    // } else if ((chatStatus + 1) % 3 == 2) {
-    //   newStatus[i] = '진행중'
-    // } else {
-    //   newStatus[i] = '진행완료'
-    // }
 
     if (chatStatus === 'FIRST') {
       newStatus[0] = '진행중'
@@ -87,71 +72,53 @@ const ProgressScreen = ({ navigation, route }) => {
     setStepStatus(newStatus)
   }
 
-  const toggleStep = (index) => {
-    const newStatus = [...stepStatus]
-    if (newStatus[index] === '진행중') {
-      newStatus[index] = '진행완료'
-      if (index < steps.length - 1) {
-        newStatus[index + 1] = '진행중'
+  const toggleStep = useCallback((index) => {
+    setStepStatus((prevStatus) => {
+      const newStatus = [...prevStatus]
+      if (newStatus[index] === '진행중') {
+        newStatus[index] = '진행완료'
+        if (index < steps.length - 1) {
+          newStatus[index + 1] = '진행중'
+        }
+      } else if (newStatus[index] === '진행완료') {
+        newStatus[index] = '진행중'
+        for (let i = index + 1; i < steps.length; i++) {
+          newStatus[i] = '대기'
+        }
       }
-    } else if (newStatus[index] === '진행완료') {
-      i = index
-      newStatus[index] = '진행중'
-      while (i < steps.length - 1) {
-        newStatus[i + 1] = '대기'
-        i++
-      }
-    }
-
-    setStepStatus(newStatus)
-    updateChatStatus(newStatus)
-  }
+      updateChatStatus(newStatus)
+      return newStatus
+    })
+  }, [])
 
   const updateChatStatus = (newStatus) => {
-    let i = 0
     let newChatStatus = ''
 
-    console.log(newStatus)
-
-    while (newStatus[i] != '진행중' && i <= 4) {
-      i++
-    }
-
-    if (i == 0) {
+    if (newStatus[0] === '진행중') {
       newChatStatus = 'FIRST'
-    } else if (i == 1) {
+    } else if (newStatus[1] === '진행중') {
       newChatStatus = 'SECOND'
-    } else if (i == 2) {
+    } else if (newStatus[2] === '진행중') {
       newChatStatus = 'THIRD'
-    } else if (i == 3) {
+    } else if (newStatus[3] === '진행중') {
       newChatStatus = 'FOURTH'
-    } else if (i == 4) {
+    } else if (newStatus[3] === '진행완료') {
       newChatStatus = 'FIFTH'
     }
 
-    // for (i = 0; newStatus[i] == '진행완료'; i++) {
-    //   newChatStatus += 3
-    // }
-    // if ((newStatus[i] = '진행중')) {
-    //   newChatStatus += 1
-    // } else if ((newStatus[i] = '진행완료')) {
-    //   newChatStatus += 2
-    // }
-
     setChatStatus(newChatStatus)
-    // 변경된 chatStatus를 서버로 전달
     sendChatStatusToServer(newChatStatus)
   }
 
   const sendChatStatusToServer = async (chatStatus) => {
     try {
       await axios.put(
-        'http://192.168.200.116:8080/posts/1' /*+ route.params.postId*/,
+        'http://127.0.0.1:8080/posts/' + postId /*+ route.params.postId*/,
         {
           dealState: chatStatus,
         }
       )
-      console.log(chatStatus), console.log('put 성공')
+      console.log(chatStatus, 'put 성공')
     } catch (error) {
       console.error('Error sending chat status:', error)
     }
@@ -192,17 +159,19 @@ const ProgressScreen = ({ navigation, route }) => {
           </View>
         ))}
       </View>
-      <View style={styles.checkboxContainer}>
-        {steps.map((step, index) => (
-          <View key={index} style={styles.checkboxWrapper}>
-            <Checkbox
-              value={stepStatus[index] === '진행완료'}
-              onValueChange={() => toggleStep(index)}
-              disabled={stepStatus[index] === '대기'}
-            />
-          </View>
-        ))}
-      </View>
+      {postUserId === route.params.userId && (
+        <View style={styles.checkboxContainer}>
+          {steps.map((step, index) => (
+            <View key={index} style={styles.checkboxWrapper}>
+              <Checkbox
+                value={stepStatus[index] === '진행완료'}
+                onValueChange={() => toggleStep(index)}
+                disabled={stepStatus[index] === '대기'}
+              />
+            </View>
+          ))}
+        </View>
+      )}
     </SafeAreaView>
   )
 }

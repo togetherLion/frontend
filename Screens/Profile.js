@@ -45,10 +45,10 @@ const Profile = ({ navigation, route }) => {
     try {
 
       const responses = await Promise.all([
-        axios.post("http://192.168.200.116:8080/user/userProfile", {
+        axios.post("http://127.0.0.1:8080/user/userProfile", {
           userId: userId,
         }),
-        axios.get(`http://192.168.200.116:8080/review/user/${userId}`),
+        axios.get(`http://127.0.0.1:8080/review/user/${userId}`),
       ]);
 
       const [resp1, resp2] = responses;
@@ -100,7 +100,7 @@ const Profile = ({ navigation, route }) => {
 
 
   const confirmFollow = () => {
-    axios.post("http://192.168.200.116:8080/follow", { userId: userId })
+    axios.post("http://127.0.0.1:8080/follow", { userId: userId })
       .then((resp) => {
         console.log(resp.data);
         if (resp.data !== null && resp.data !== "") {
@@ -116,7 +116,7 @@ const Profile = ({ navigation, route }) => {
   };
 
   const confirmUnfollow = () => {
-    axios.post("http://192.168.200.116:8080/follow/unfollow", { userId: userId })
+    axios.post("http://127.0.0.1:8080/follow/unfollow", { userId: userId })
       .then((resp) => {
         console.log(resp.data);
         if (resp.data !== null && resp.data !== "") {

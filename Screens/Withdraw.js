@@ -12,7 +12,7 @@ const Withdraw = ({ navigation, route }) => {
 
 
   const withdraw = () => {
-    axios.delete("http://192.168.200.116:8080/user/unregister", {
+    axios.delete("http://127.0.0.1:8080/user/unregister", {
       data: { password: password }
     })
       .then((resp) => {

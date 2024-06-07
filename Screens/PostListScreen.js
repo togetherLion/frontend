@@ -22,7 +22,7 @@ const PostListScreen = ({ navigation, route }) => {
 
     async function getPostList() {
         try {
-            const resp = await axios.get("http://192.168.200.116:8080/posts/region")
+            const resp = await axios.get("http://127.0.0.1:8080/posts/region")
 
             if (resp.data !== null && resp.data !== "") {
                 //console.log(resp.data);

@@ -55,10 +55,10 @@ const PostDetail = ({ route }) => { // navigation 제거
 
     const handleHeartPress = () => {
         if (!isgood) {
-            axios.post("http://192.168.200.116:8080/goods/postlike", { postId: postId });
+            axios.post("http://127.0.0.1:8080/goods/postlike", { postId: postId });
         }
         else {
-            axios.delete("http://192.168.200.116:8080/goods", {
+            axios.delete("http://127.0.0.1:8080/goods", {
                 params: {
                     postId: postId
                 }
@@ -98,6 +98,8 @@ const PostDetail = ({ route }) => { // navigation 제거
             }
         };
 
+        
+
         fetchData();
     }, [postId, navigation]);
 
@@ -106,8 +108,8 @@ const PostDetail = ({ route }) => { // navigation 제거
     async function getPostDetail() {
         try {
             const responses = await Promise.all([
-                axios.get(`http://192.168.200.116:8080/posts/${postId}`),
-                axios.get(`http://192.168.200.116:8080/posts/user-posts/${postId}`),
+                axios.get(`http://127.0.0.1:8080/posts/${postId}`),
+                axios.get(`http://127.0.0.1:8080/posts/user-posts/${postId}`),
             ]);
 
             const [resp1, resp2] = responses;
@@ -168,7 +170,7 @@ const PostDetail = ({ route }) => { // navigation 제거
 
 
     const confirmParticipate = () => {
-        axios.post("http://192.168.200.116:8080/waitingdeal", { postId: postId })
+        axios.post("http://127.0.0.1:8080/waitingdeal", { postId: postId })
             .then((resp) => {
                 console.log(resp.data);
                 if (resp.data !== null && resp.data !== "") {
@@ -190,7 +192,7 @@ const PostDetail = ({ route }) => { // navigation 제거
     };
 
     const confirmDelete = () => {
-        axios.delete(`http://192.168.200.116:8080/posts/${postId}`)
+        axios.delete(`http://127.0.0.1:8080/posts/${postId}`)
             .then((resp) => {
                 setModalType('deleteconfirm');
                 setModalMessage('삭제 완료');
@@ -334,15 +336,9 @@ const PostDetail = ({ route }) => { // navigation 제거
                     <Ionicons name={isgood ? "heart" : "heart-outline"} size={33} color="pink" style={styles.heartIcon} />
                 </TouchableOpacity>
                 <Text style={styles.price}>{formatPrice(post.price.toString())}원</Text>
-                {userId !== postuserId ? (
-                    <TouchableOpacity style={styles.wantbutton} onPress={handlePar}>
+                <TouchableOpacity style={styles.wantbutton} onPress={() => navigation.navigate("ChatButton", {userId : userId, postId : postId, postUserId : post.userId})}>
                         <Text style={styles.buttonText}>참여하기</Text>
                     </TouchableOpacity>
-                ) : (
-                    <TouchableOpacity style={styles.wantbutton} onPress={handleWaitlist}>
-                        <Text style={styles.buttonText}>대기테이블 보기</Text>
-                    </TouchableOpacity>
-                )}
             </View>
 
 
