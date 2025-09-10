@@ -15,7 +15,7 @@ const EditAddress = ({ navigation, route }) => {
     const [loading, setLoading] = useState(true);
 
     const handleAddressChange = () => {
-        axios.post("http://192.168.200.116:8080/user/changeAddr", {
+        axios.post("http://172.30.1.62:8080/user/changeAddr", {
             address: address.formattedAddress,
             userLat: location.coords.latitude,
             userLong: location.coords.longitude

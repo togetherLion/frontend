@@ -13,9 +13,22 @@ const Place = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true); // 위치 정보를 가져오는 중 여부를 나타내는 상태
   //const navigation = useNavigation();
 
+  // const confirmAddress = () => {
+  //   navigation.navigate('SignupScreen', { phone:phone, userAddress: address.formattedAddress, userLat: location.coords.latitude, userLong: location.coords.longitude});
+  // };
+
   const confirmAddress = () => {
-    navigation.navigate('SignupScreen', { phone:phone, userAddress: address.formattedAddress, userLat: location.coords.latitude, userLong: location.coords.longitude});
-  };
+    setModalVisible(false); // 모달 닫기
+
+    // 방법 A: 짧게 지연 후 이동
+    setTimeout(() => {
+      navigation.navigate('SignupScreen', {
+        phone,
+        userAddress: address?.formattedAddress ?? '',
+        userLat: location?.coords?.latitude,
+        userLong: location?.coords?.longitude,
+      });
+    }, 150);};
 
   useEffect(() => {
     (async () => {
@@ -53,15 +66,16 @@ const Place = ({ navigation, route }) => {
           <Marker coordinate={mapRegion}>
             <Text>{address ? `${address.formattedAddress}` : ''}</Text>
           </Marker>
+
+          {!loading && ( // 위치 정보를 가져오는 중이 아닐 때만 버튼 표시
+            <Pressable onPress={() => setModalVisible(true)} style={styles.addressButton}>
+              <Text style={styles.buttonText}>주소 설정</Text>
+            </Pressable>
+          )}
+
         </MapView>
       )}
-      {!loading && ( // 위치 정보를 가져오는 중이 아닐 때만 버튼 표시
-        <View style={styles.addressButton}>
-          <Pressable onPress={() => setModalVisible(true)}>
-            <Text style={styles.buttonText}>주소 설정</Text>
-          </Pressable>
-        </View>
-      )}
+      
       <Modal
         animationType="slide"
         transparent={true}
@@ -78,6 +92,7 @@ const Place = ({ navigation, route }) => {
               <Text style={styles.closeButton}>확인</Text>
             </Pressable>
           </View>
+          
         </View>
       </Modal>
     </View>
@@ -94,14 +109,22 @@ const styles = StyleSheet.create({
   },
   addressButton: {
     position: 'absolute',
-    top: '55%', // 화면 세로 중앙
-    left: '43%', // 화면 가로 중앙
-    //justifyContent: 'center',
-    //transform: [{ translateX: '-50%' }, { translateY: '-50%' }], // 버튼을 중앙으로 이동
+    bottom: 0,
+    left: 0,
+    right: 0,
+
+    backgroundColor: '#ffcc80',
+    paddingVertical: 15, 
+    alignItems: 'center',
+
+    marginHorizontal: 20,
+    marginBottom: 30,
+
+    borderRadius: 10,
   },
   buttonText: {
-    color: 'blue',
-    fontSize: 30,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
   },
   modalView: {

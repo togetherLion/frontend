@@ -18,7 +18,7 @@ const EditName = ({ navigation, route }) => {
             setModalVisible(true);
         } else {
             try {
-                axios.post("http://192.168.200.116:8080/chat/check-and-create-room", null, {
+                axios.post("http://172.30.1.62:8080/chat/check-and-create-room", null, {
                     params: {
                         postId: postId,
                         roomName: roomName

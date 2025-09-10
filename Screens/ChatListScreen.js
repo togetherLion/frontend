@@ -7,11 +7,6 @@ const ChatListScreen = ({ navigation, route }) => {
 
     const [userId, setUserId] = useState(route.params?.userId || '');
 
-    //   const chatData = [
-    //     { id: '1', name: 'ChatName', time: '12:30pm', participants: 5, image: 'https://via.placeholder.com/50' },
-    //     { id: '1', name: 'ChatName', time: '12:30pm', participants: 5, image: 'https://via.placeholder.com/50' },
-
-    //   ];
 
 
     const [chatData, setChatData] = useState([]); // 서버로부터 받아온 채팅 데이터를 저장할 상태
@@ -19,7 +14,7 @@ const ChatListScreen = ({ navigation, route }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://192.168.200.116:8080/chat/my');
+                const response = await axios.get('http://172.30.1.62:8080/chat/my');
                 // 서버로부터 받아온 데이터를 상태에 저장
                 setChatData(response.data.map(item => ({
                     ...item,
@@ -35,18 +30,44 @@ const ChatListScreen = ({ navigation, route }) => {
 
 
 
+    // const renderItem = ({ item }) => (
+
+
+    //     <View style={styles.chatItem}>
+    //         <Image source={require('../assets/balbadag.png')} style={styles.chatImage} />
+    //         <View style={styles.chatDetails}>
+    //             <Text style={styles.chatName}>{item.name}</Text>
+    //             <Text style={styles.chatTime}>{item.time}</Text>
+
+    //         </View>
+    //     </View>
+    // );
+
+
+
+
     const renderItem = ({ item }) => (
-
-
-        <View style={styles.chatItem}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('ChatRoom', {
+              userId: userId,          // 현재 사용자 id
+              postId: item.postId,     // 게시글 id
+              postUserId: item.userId, // 게시글 작성자 id
+              roomId: item.roomId,     // 채팅방 uuid
+              chatRoomId: item.ChatRoomId, // DB pk
+            })
+          }
+        >
+          <View style={styles.chatItem}>
             <Image source={require('../assets/balbadag.png')} style={styles.chatImage} />
             <View style={styles.chatDetails}>
-                <Text style={styles.chatName}>{item.name}</Text>
-                <Text style={styles.chatTime}>{item.time}</Text>
-
+              <Text style={styles.chatName}>{item.chatroomName}</Text>
+              
             </View>
-        </View>
-    );
+          </View>
+        </TouchableOpacity>
+      )
+      
 
     return (
 

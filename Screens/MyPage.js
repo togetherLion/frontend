@@ -42,9 +42,9 @@ const MyPage = ({ navigation, route }) => {
   async function getMyPage() {
     try {
       const responses = await Promise.all([
-        axios.post("http://192.168.200.116:8080/user/userProfile", { userId: userId }),
-        axios.get("http://192.168.200.116:8080/posts/my"),
-        axios.get("http://192.168.200.116:8080/goods/liked"),
+        axios.post("http://172.30.1.62:8080/user/userProfile", { userId: userId }),
+        axios.get("http://172.30.1.62:8080/posts/my"),
+        axios.get("http://172.30.1.62:8080/goods/liked"),
       ]);
 
       const [resp1, resp2, resp3] = responses;
@@ -95,7 +95,7 @@ const MyPage = ({ navigation, route }) => {
   };
 
   const confirmLogout = () => {
-    axios.post("http://192.168.200.116:8080/user/logout")
+    axios.post("http://165.229.169.121:8080/user/logout")
       .then((resp) => {
         console.log(resp.data);
         if (resp.data !== null && resp.data !== "") {
@@ -142,40 +142,40 @@ const MyPage = ({ navigation, route }) => {
   }
 
   return (
+  <View style={styles.bigcontainer}> {/* flex: 1 */}
 
-    <View Style={styles.bigcontainer}>
-      <ScrollView style={styles.container}>
-        <View style={styles.header}></View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollViewContentContainer}>
+      <View style={styles.header}></View>
 
-        <View style={styles.profileContainer}>
-          <Image
-            style={styles.profileImage}
-            source={{ uri: profilePicture }} // 프로필 이미지 URL
-          />
-          <View style={styles.profileTextContainer}>
-            <Text style={styles.profileName}> {nickname} ({townName})</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => navigation.navigate('Profile', { userId: userId })}
-              >
-                <Text style={styles.editButtonText}>내 프로필 보기</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => navigation.navigate('UserInform')}
-              >
-                <Text style={styles.editButtonText}>회원 정보 보기</Text>
-              </TouchableOpacity>
-            </View>
+      <View style={styles.profileContainer}>
+        <Image
+          style={styles.profileImage}
+          source={{ uri: profilePicture }} // 프로필 이미지 URL
+        />
+        <View style={styles.profileTextContainer}>
+          <Text style={styles.profileName}> {nickname} ({townName})</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate('Profile', { userId: userId })}
+            >
+              <Text style={styles.editButtonText}>내 프로필 보기</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate('UserInform')}
+            >
+              <Text style={styles.editButtonText}>회원 정보 보기</Text>
+            </TouchableOpacity>
           </View>
         </View>
+      </View>
 
 
-        <View>
-          {myPost && myPost.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>내가 작성한 공구글</Text>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>내가 작성한 공구글</Text>
+            {myPost && myPost.length > 0 ? ( // myPost 데이터가 있을 때만 FlatList 보여주기
               <FlatList
                 horizontal
                 data={myPost}
@@ -183,13 +183,16 @@ const MyPage = ({ navigation, route }) => {
                 keyExtractor={(item) => item.id}
                 showsHorizontalScrollIndicator={false}
               />
-            </View>
-          )}
-        </View>
+            ) : ( // myPost 데이터가 없을 때 메시지 보여주기
+              <Text style={styles.noContentMessage}>작성한 공구글이 없습니다</Text>
+            )}
+          </View>
 
-        {likedPost && likedPost.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>내가 찜한 공구글</Text>
+
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>내가 찜한 공구글</Text>
+          {likedPost && likedPost.length > 0 ? ( // likedPost 데이터가 있을 때만 FlatList 보여주기
             <FlatList
               horizontal
               data={likedPost}
@@ -197,75 +200,78 @@ const MyPage = ({ navigation, route }) => {
               keyExtractor={(item) => item.id}
               showsHorizontalScrollIndicator={false}
             />
-          </View>
-        )}
-
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.footerButton} onPress={handleEditPass}>
-            <Text style={styles.footerButtonText}>비밀번호 변경</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.footerButton} onPress={handleLogout}>
-            <Text style={styles.footerButtonText}>로그아웃</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.footerButton} onPress={handleWithdraw}>
-            <Text style={styles.footerButtonText}>회원 탈퇴</Text>
-          </TouchableOpacity>
+          ) : ( // likedPost 데이터가 없을 때 메시지 보여주기
+            <Text style={styles.noContentMessage}>찜한 공구글이 없습니다</Text>
+          )}
         </View>
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalText}>{modalMessage}</Text>
-              <View style={styles.buttonRow}>
-                <TouchableOpacity
-                  style={[styles.button, styles.closeButton]}
-                  onPress={confirmAction}
-                >
-                  <Text style={styles.closeButtonText}>예</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.button, styles.closeButton]}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.closeButtonText}>아니오</Text>
-                </TouchableOpacity>
-              </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>{modalMessage}</Text>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.button, styles.closeButton]}
+                onPress={confirmAction}
+              >
+                <Text style={styles.closeButtonText}>예</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.closeButton]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>아니오</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
-        
-      </ScrollView>
+      
 
-      <View style={styles.bottomBar}>
-                <TouchableOpacity onPress={() => navigation.navigate('PostListScreen', { userId: userId })}style={styles.bottomBarItem}>
-                    <MaterialIcons name="home" size={24} color="#bbb" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('SearchScreen', { userId: userId })} style={styles.bottomBarItem}>
-                    <MaterialIcons name="search" size={24} color="#bbb" />
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => navigation.navigate('ChatListScreen', { userId: userId })} style={styles.bottomBarItem}>
-                    <MaterialIcons name="chat" size={24} color="#bbb" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('MyPage', { userId: userId })} style={styles.bottomBarItem}>
-                    <MaterialIcons name="person" size={24} color="#bbb" />
-                </TouchableOpacity>
-            </View>
+    </ScrollView>
 
-
+    <View style={styles.fixedButtonsContainer}>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton} onPress={handleEditPass}>
+          <Text style={styles.footerButtonText}>비밀번호 변경</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton} onPress={handleLogout}>
+          <Text style={styles.footerButtonText}>로그아웃</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton} onPress={handleWithdraw}>
+          <Text style={styles.footerButtonText}>회원 탈퇴</Text>
+        </TouchableOpacity>
+      </View>
     </View>
 
 
-  );
+    <View style={styles.bottomBar}>
+      <TouchableOpacity onPress={() => navigation.navigate('PostListScreen', { userId: userId })} style={styles.bottomBarItem}>
+        <MaterialIcons name="home" size={24} color="#bbb" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('SearchScreen', { userId: userId })} style={styles.bottomBarItem}>
+        <MaterialIcons name="search" size={24} color="#bbb" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('ChatListScreen', { userId: userId })} style={styles.bottomBarItem}>
+        <MaterialIcons name="chat" size={24} color="#bbb" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('MyPage', { userId: userId })} style={styles.bottomBarItem}>
+        <MaterialIcons name="person" size={24} color="#bbb" />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
 };
 const styles = StyleSheet.create({
   bigcontainer: {
@@ -276,8 +282,24 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#fff',
-    marginBottom : 49,
+    //marginBottom : 49,
     //minHeight: 650,
+  },
+  scrollViewContentContainer: {
+    flexGrow: 1, 
+    //justifyContent: 'space-between', 
+  },
+  fixedButtonsContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 50,
+
+    backgroundColor: '#f5f5f5', 
+    paddingBottom: 0, 
+    borderTopWidth: 1, 
+    borderTopColor: '#eee',
+
   },
   header: {
     width: '100%',
@@ -417,6 +439,12 @@ bottomBarItem: {
     alignItems: 'center',
     color: '#ffcc80',
 },
+noContentMessage: {
+    textAlign: 'center', 
+    paddingVertical: 20, 
+    color: '#888',       
+    fontSize: 14,
+  },
 
 
 

@@ -14,7 +14,7 @@ const Alarmlist = ({ navigation }) => {
 
   const fetchAlarmData = async () => {
     try {
-      const response = await axios.get('http://192.168.200.116:8080/alarm/list');
+      const response = await axios.get('http://172.30.1.62:8080/alarm/list');
       const responseData = response.data.map(alarm => ({
         ...alarm,
         isRead: false // Initialize isRead as false
@@ -42,7 +42,7 @@ const Alarmlist = ({ navigation }) => {
   const markAlarmAsRead = async (alarmId) => {
     try {
       // POST 요청으로 변경하고 alarmId를 URL에 추가
-      await axios.post(`http://192.168.200.116:8080/alarm/check?alarmId=${alarmId}`);
+      await axios.post(`http://172.30.1.62:8080/alarm/check?alarmId=${alarmId}`);
     } catch (error) {
       console.error('Error marking alarm as read:', error.response ? error.response.data : error.message);
     }
@@ -75,19 +75,22 @@ const Alarmlist = ({ navigation }) => {
       } else if (alarm.alarmType === 'CREATECHAT') {
         try {
             console.log("시도함");
-            //console.log(alarm.connectId);
-            const response = await axios.get(`http://192.168.200.116:8080/waitingdeal/check-chat-room/${alarm.connectId}`);
-            //console.log(response.data);
-            //console.log(response.data.roomId);
-            //console.log(response.data.post.userId);
-            //console.log(response.data.roomId);
+
+
+            const response = await axios.get(`http://172.30.1.62:8080/waitingdeal/check-chat-room/${alarm.connectId}`);
+            console.log("🔥 전체 응답:", response.data);
+            console.log("📌 roomId:", response.data.roomId);
+            console.log("📌 userId:", response.data.user.userId);
 
             navigation.navigate('ChatRoom', { 
-                userId: alarm.userId, 
-                roomId: response.data.roomId, // response.data에서 roomId 접근
-                postUserId: response.data.post.userId, // response.data에서 post.userId 접근
-                postId: alarm.connectId // connectID의 철자 오류 수정
-            });
+                         userId: response.data.user.userId,   // 서버 응답의 userId 사용
+                         roomId: response.data.roomId,        // 서버 응답의 roomId 사용
+                         postUserId: response.data.user.userId, // 게시글 작성자 ID → 이게 맞는지 확인 필요
+                         postId: alarm.connectId
+                     });
+
+
+
         } catch (error) {
             console.error('Error fetching chat room:', error.response ? error.response.data : error.message);
         }
