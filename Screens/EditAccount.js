@@ -23,7 +23,7 @@ const EditAccount = ({ navigation, route }) => {
             setModalVisible(true);
         }
         else {
-            axios.post("http://172.30.1.62:8080/user/changeAccount", {
+            axios.post("http://192.168.219.45:8080/user/changeAccount", {
                 account: reaccount,
             }).then(function (resp) {   
                 console.log(resp.data);

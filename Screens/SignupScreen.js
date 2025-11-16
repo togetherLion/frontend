@@ -25,7 +25,7 @@ const SignupScreen = ({ navigation, route }) => {
       setModalMessage('ID가 입력되지 않았습니다.');
       setModalVisible(true);
     } else {
-      axios.post("http://172.30.1.62:8080/user/idCheck", {
+      axios.post("http://192.168.219.45:8080/user/idCheck", {
         loginId: loginId
       }).then(function (response) {
         console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
@@ -46,7 +46,7 @@ const SignupScreen = ({ navigation, route }) => {
     if (nickName.trim() === "") {
       setModalMessage('닉네임이 입력되지 않았습니다.');
     } else {
-      axios.post("http://172.30.1.62:8080/user/nicknameCheck", {
+      axios.post("http://192.168.219.45:8080/user/nicknameCheck", {
         nickname: nickName,
       }).then(function (response) {
         console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
@@ -76,7 +76,7 @@ const SignupScreen = ({ navigation, route }) => {
       setModalMessage('사용할 수 없는 닉네임입니다.');
       setModalVisible(true);
     } else {
-      axios.post("http://172.30.1.62:8080/user/signup", {
+      axios.post("http://192.168.219.45:8080/user/signup", {
         loginId: loginId,
         password: password,
         name: name,

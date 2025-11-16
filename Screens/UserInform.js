@@ -24,7 +24,7 @@ const UserInform = ({ navigation }) => {
 
     async function getInform() {
         try {
-            const resp = await axios.post("http://172.30.1.62:8080/user/userInfo");
+            const resp = await axios.post("http://192.168.219.45:8080/user/userInfo");
             if (resp.data) {
                 setLoginId(resp.data.loginId);
                 setUserAddress(resp.data.userAddress);

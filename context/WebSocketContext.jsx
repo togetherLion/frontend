@@ -64,7 +64,7 @@ export const WebSocketProvider = ({ children }) => {
   // Provider 마운트 시 중복 연결 방지
   useEffect(() => {
     if (!state.connected) {
-      dispatch({ type: 'CONNECT', payload: 'ws://172.30.1.62:8080/ws/chat' })
+      dispatch({ type: 'CONNECT', payload: 'ws://192.168.219.45:8080/ws/chat' })
     }
 
     // 언마운트 시 연결 종료

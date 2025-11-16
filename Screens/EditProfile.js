@@ -23,25 +23,66 @@ const EditProfile = ({ navigation, route }) => {
         requestPermission();
     }, []);
 
+    // const pickImage = async () => {
+    //     let result = await ImagePicker.launchImageLibraryAsync({
+    //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //         allowsEditing: true,
+    //         aspect: [3, 3],
+    //         quality: 1,
+    //     });
+
+    //     if (!result.canceled) {
+    //         const base64 = await FileSystem.readAsStringAsync(result.assets[0].uri, {
+    //             encoding: FileSystem.EncodingType.Base64,
+    //         });
+    //         setProfilePicture(`data:image/jpeg;base64,${base64}`);
+    //     }
+    // };
+
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        try {
+          // 권한 체크/요청
+          const perm = await ImagePicker.getMediaLibraryPermissionsAsync();
+          if (perm.status !== 'granted') {
+            const req = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (req.status !== 'granted') {
+              alert('이미지 접근 권한이 필요합니다.');
+              return;
+            }
+          }
+      
+          const supportsNew = !!ImagePicker.MediaType; // 54+면 true, 53이면 false
+      
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: supportsNew ? 'images' : ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [3, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            const base64 = await FileSystem.readAsStringAsync(result.assets[0].uri, {
-                encoding: FileSystem.EncodingType.Base64,
-            });
-            setProfilePicture(`data:image/jpeg;base64,${base64}`);
+            quality: 0.8,
+            base64: true, // ← 옛날처럼 바로 base64 받기
+          });
+      
+          const canceled = supportsNew ? result?.canceled : result?.cancelled;
+          if (canceled) return;
+      
+          const asset = result?.assets?.[0];
+          if (!asset) return;
+      
+          const mime = asset.mimeType || 'image/jpeg';
+          if (!asset.base64) {
+            alert('이미지 Base64가 비어 있습니다.');
+            return;
+          }
+          setProfilePicture(`data:${mime};base64,${asset.base64}`);
+        } catch (e) {
+          console.error('[pickImage] error', e);
+          alert('이미지 선택 중 오류가 발생했습니다.');
         }
-    };
+      };
+      
 
     const saveProfile = async () => {
         try {
-            const resp = await axios.post("http://172.30.1.62:8080/user/modifyProfile", {
+            const resp = await axios.post("http://192.168.219.45:8080/user/modifyProfile", {
                 userId: 15,
                 nickname: nickname,
                 profileIntro: profileIntro,

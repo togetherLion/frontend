@@ -48,7 +48,7 @@ const SearchScreen = ({ navigation, route }) => {
 
     const fetchRecentSearches = async () => {
         try {
-            const response = await axios.post('http://172.30.1.62:8080/posts/recentSearch');
+            const response = await axios.post('http://192.168.219.45:8080/posts/recentSearch');
             setRecentSearches(response.data); // 최근 검색어 5개만 설정
         } catch (error) {
             console.error(error);
@@ -72,16 +72,16 @@ const SearchScreen = ({ navigation, route }) => {
 
 
 
-        let url = `http://172.30.1.62:8080/posts/search/${searchText}`;
+        let url = `http://192.168.219.45:8080/posts/search/${searchText}`;
 
         if (sortOption === '저가순') {
-            url = `http://172.30.1.62:8080/posts/search/low/${searchText}`;
+            url = `http://192.168.219.45:8080/posts/search/low/${searchText}`;
         } else if (sortOption === '고가순') {
-            url = `http://172.30.1.62:8080/posts/search/high/${searchText}`;
+            url = `http://192.168.219.45:8080/posts/search/high/${searchText}`;
         } else if (sortOption === '최신순') {
-            url = `http://172.30.1.62:8080/posts/search/${searchText}`;
+            url = `http://192.168.219.45:8080/posts/search/${searchText}`;
         } else if (sortOption === '가격대설정') {
-            url = `http://172.30.1.62:8080 /posts/search/${searchText}/${lowPrice}/${highPrice}`;
+            url = `http://192.168.219.45:8080 /posts/search/${searchText}/${lowPrice}/${highPrice}`;
         }
 
         try {
@@ -100,7 +100,7 @@ const SearchScreen = ({ navigation, route }) => {
 
     const handleSearch2 = async (searchTerm) => {
         // 사용할 검색어로 searchTerm을 직접 사용
-        let url = `http://172.30.1.62:8080/posts/search/${searchTerm}`;
+        let url = `http://192.168.219.45:8080/posts/search/${searchTerm}`;
 
         try {
             const response = await axios.get(url);
@@ -149,10 +149,10 @@ const SearchScreen = ({ navigation, route }) => {
             return;
         }
 
-        let url = `http://172.30.1.62:8080/posts/search/${searchText}`;
+        let url = `http://192.168.219.45:8080/posts/search/${searchText}`;
 
         if (sortOption === '가격대설정') {
-            url = `http://172.30.1.62:8080/posts/search/${searchText}/${lowPrice}/${highPrice}`;
+            url = `http://192.168.219.45:8080/posts/search/${searchText}/${lowPrice}/${highPrice}`;
         }
 
         try {

@@ -42,9 +42,9 @@ const MyPage = ({ navigation, route }) => {
   async function getMyPage() {
     try {
       const responses = await Promise.all([
-        axios.post("http://172.30.1.62:8080/user/userProfile", { userId: userId }),
-        axios.get("http://172.30.1.62:8080/posts/my"),
-        axios.get("http://172.30.1.62:8080/goods/liked"),
+        axios.post("http://192.168.219.45:8080/user/userProfile", { userId: userId }),
+        axios.get("http://192.168.219.45:8080/posts/my"),
+        axios.get("http://192.168.219.45:8080/goods/liked"),
       ]);
 
       const [resp1, resp2, resp3] = responses;

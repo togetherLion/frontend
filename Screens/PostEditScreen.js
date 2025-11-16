@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImageManipulator from 'expo-image-manipulator';
 
-const SERVER_URL = 'http://172.30.1.62:8080/posts';
+const SERVER_URL = 'http://192.168.219.45:8080/posts';
 
 const PostEditScreen = ({ navigation, route }) => {
   const { post } = route.params; // 전달받은 post 객체
