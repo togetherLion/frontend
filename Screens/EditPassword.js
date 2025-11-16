@@ -14,7 +14,7 @@ const EditPassword = ({ navigation, route }) => {
       setModalMessage('비밀번호 확인이 일치하지 않습니다.');
       setModalVisible(true);
     } else {
-      axios.post("http://192.168.219.45:8080/user/changePw", { nowPassword: nowPassword, newPassword: newPassword })
+      axios.post("http://172.30.1.81:8080/user/changePw", { nowPassword: nowPassword, newPassword: newPassword })
         .then((resp) => {
           console.log(resp.data);
           if (resp.data !== null && resp.data !== "") {

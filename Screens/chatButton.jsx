@@ -25,7 +25,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
       const checkChatRoom = async () => {
         try {
           const response = await axios.get(
-            'http://192.168.219.45:8080/waitingdeal/check-chat-room/' + postId
+            'http://172.30.1.81:8080/waitingdeal/check-chat-room/' + postId
           )
           if (response.data.roomId) {
             setChatRoomExists(true)
@@ -44,7 +44,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
   const checkCreateChat = async () => {
     try {
       const response = await axios.get(
-        'http://192.168.219.45:8080/waitingdeal/accepted-users?postId=' + postId/*+ 현재 postId로 바꾸기*/
+        'http://172.30.1.81:8080/waitingdeal/accepted-users?postId=' + postId/*+ 현재 postId로 바꾸기*/
       )
 
       const data = response.data
@@ -63,7 +63,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
   const createChat = async (postId, roomName) => {
     try {
       const response = await axios.post(
-        'http://192.168.219.45:8080/chat/check-and-create-room?' +
+        'http://172.30.1.81:8080/chat/check-and-create-room?' +
           'postId=' +
           postId +
           '&roomName=' +
@@ -85,7 +85,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
   const joinChatRoom = async () => {
     try {
       const response = await axios.get(
-        'http://192.168.219.45:8080/waitingdeal/check-chat-room/' + postId
+        'http://172.30.1.81:8080/waitingdeal/check-chat-room/' + postId
       )
       navigation.navigate('ChatRoom', {
         userId: userId,
@@ -100,7 +100,7 @@ const ChatButtonScreen = ({ navigation, route }) => {
 
   const sendWaiting = async () => {
     try {
-      await axios.post('http://192.168.219.45:8080/waitingdeal', {
+      await axios.post('http://172.30.1.81:8080/waitingdeal', {
         postId: postId, // 현재 postId로 바꾸기
       })
       Alert.alert('참여가 요청되었습니다!')

@@ -59,7 +59,7 @@
 //         await getRecommend()
 
 //         const response = await axios.get(
-//           `http://192.168.219.45:8080/waitingdeal/check-chat-room/${postId}`
+//           `http://172.30.1.81:8080/waitingdeal/check-chat-room/${postId}`
 //         )
 //         console.log('📌 chat room 응답:', response.data)
 //         setRoomId(response.data.roomId)
@@ -67,7 +67,7 @@
 //         if (!connected) {
 //           websocketDispatch({
 //             type: 'CONNECT',
-//             payload: 'ws://192.168.219.45:8080/ws/chat',
+//             payload: 'ws://172.30.1.81:8080/ws/chat',
 //           })
 //         }
 //       } catch (error) {
@@ -129,7 +129,7 @@
 //   const getNickname = async () => {
 //     try {
 //       const response = await axios.post(
-//         'http://192.168.219.45:8080/user/userProfile',
+//         'http://172.30.1.81:8080/user/userProfile',
 //         { userId }
 //       )
 //       setNickname(response.data.nickname)
@@ -140,7 +140,7 @@
 
 //   const getAccount = async () => {
 //     try {
-//       const response = await axios.get('http://192.168.219.45:8080/chat/account')
+//       const response = await axios.get('http://172.30.1.81:8080/chat/account')
 //       setCheatMsg(response.data.cheatMsg)
 //       setAccount(response.data.account)
 //     } catch (error) {
@@ -150,7 +150,7 @@
 
 //   const getRecommend = async () => {
 //     try {
-//       const response = await axios.get('http://192.168.219.45:8080/chat/recommend', {
+//       const response = await axios.get('http://172.30.1.81:8080/chat/recommend', {
 //         params: { postId },
 //       })
 //       setRecommendations(response.data)
@@ -547,14 +547,14 @@ const ChatRoomScreen = ({ navigation, route }) => {
         await getRecommend()
 
         const response = await axios.get(
-          `http://192.168.219.45:8080/waitingdeal/check-chat-room/${postId}`
+          `http://172.30.1.81:8080/waitingdeal/check-chat-room/${postId}`
         )
         setRoomId(response.data.roomId)
 
         if (!connected) {
           websocketDispatch({
             type: 'CONNECT',
-            payload: 'ws://192.168.219.45:8080/ws/chat',
+            payload: 'ws://172.30.1.81:8080/ws/chat',
           })
         }
       } catch (error) {
@@ -613,7 +613,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
   const getNickname = async () => {
     try {
       const response = await axios.post(
-        'http://192.168.219.45:8080/user/userProfile',
+        'http://172.30.1.81:8080/user/userProfile',
         { userId }
       )
       setNickname(response.data.nickname)
@@ -624,7 +624,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
 
   const getAccount = async () => {
     try {
-      const response = await axios.get('http://192.168.219.45:8080/chat/account')
+      const response = await axios.get('http://172.30.1.81:8080/chat/account')
       setCheatMsg(response.data.cheatMsg)
       setAccount(response.data.account)
     } catch (error) {
@@ -634,7 +634,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
 
   const getRecommend = async () => {
     try {
-      const response = await axios.get('http://192.168.219.45:8080/chat/recommend', {
+      const response = await axios.get('http://172.30.1.81:8080/chat/recommend', {
         params: { postId },
       })
       setRecommendations(response.data)

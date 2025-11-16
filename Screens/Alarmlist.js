@@ -14,7 +14,7 @@ const Alarmlist = ({ navigation }) => {
 
   const fetchAlarmData = async () => {
     try {
-      const response = await axios.get('http://192.168.219.45:8080/alarm/list');
+      const response = await axios.get('http://172.30.1.81:8080/alarm/list');
       const responseData = response.data.map(alarm => ({
         ...alarm,
         isRead: false // Initialize isRead as false
@@ -42,7 +42,7 @@ const Alarmlist = ({ navigation }) => {
   const markAlarmAsRead = async (alarmId) => {
     try {
       // POST 요청으로 변경하고 alarmId를 URL에 추가
-      await axios.post(`http://192.168.219.45:8080/alarm/check?alarmId=${alarmId}`);
+      await axios.post(`http://172.30.1.81:8080/alarm/check?alarmId=${alarmId}`);
     } catch (error) {
       console.error('Error marking alarm as read:', error.response ? error.response.data : error.message);
     }
@@ -77,7 +77,7 @@ const Alarmlist = ({ navigation }) => {
             console.log("시도함");
 
 
-            const response = await axios.get(`http://192.168.219.45:8080/waitingdeal/check-chat-room/${alarm.connectId}`);
+            const response = await axios.get(`http://172.30.1.81:8080/waitingdeal/check-chat-room/${alarm.connectId}`);
             console.log("🔥 전체 응답:", response.data);
             console.log("📌 roomId:", response.data.roomId);
             console.log("📌 userId:", response.data.user.userId);

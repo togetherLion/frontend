@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as ImageManipulator from 'expo-image-manipulator';
 
-const SERVER_URL = 'http://192.168.219.45:8080/posts';
+const SERVER_URL = 'http://172.30.1.81:8080/posts';
 
 const PostEditScreen = ({ navigation, route }) => {
   const { post } = route.params; // 전달받은 post 객체
@@ -40,37 +40,80 @@ const PostEditScreen = ({ navigation, route }) => {
     })();
   }, []);
 
+  // const selectPhoto = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: false,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   if (!result.cancelled && result.assets && result.assets.length > 0) {
+  //     const base64Image = await compressImageAndConvertToBase64(result.assets[0].uri);
+  //     setPhoto(`data:image/jpeg;base64,${base64Image}`);
+  //   }
+  // };
+
+  // const compressImageAndConvertToBase64 = async (uri) => {
+  //   try {
+  //     const manipResult = await ImageManipulator.manipulateAsync(
+  //       uri,
+  //       [{ resize: { width: 800 } }],
+  //       { compress: 0.5 }
+  //     );
+  //     const base64Image = await FileSystem.readAsStringAsync(manipResult.uri, {
+  //       encoding: FileSystem.EncodingType.Base64,
+  //     });
+  //     return base64Image;
+  //   } catch (error) {
+  //     console.error("Error compressing image and converting to Base64:", error);
+  //     throw error;
+  //   }
+  // };
+
   const selectPhoto = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled && result.assets && result.assets.length > 0) {
-      const base64Image = await compressImageAndConvertToBase64(result.assets[0].uri);
-      setPhoto(`data:image/jpeg;base64,${base64Image}`);
-    }
-  };
-
-  const compressImageAndConvertToBase64 = async (uri) => {
     try {
-      const manipResult = await ImageManipulator.manipulateAsync(
-        uri,
-        [{ resize: { width: 800 } }],
-        { compress: 0.5 }
-      );
-      const base64Image = await FileSystem.readAsStringAsync(manipResult.uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      return base64Image;
-    } catch (error) {
-      console.error("Error compressing image and converting to Base64:", error);
-      throw error;
+      // 권한 체크
+      const perm = await ImagePicker.getMediaLibraryPermissionsAsync();
+      if (perm.status !== 'granted') {
+        const req = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (req.status !== 'granted') {
+          Alert.alert('알림', '사진 접근 권한이 필요합니다.');
+          return;
+        }
+      }
+  
+      // ✅ SDK 54: 'images' (문자열) 사용
+      // ✅ SDK 53: MediaTypeOptions.Images 사용
+      const supportsNew = !!ImagePicker.MediaType; // 54+면 true, 53이면 false
+      const pickOptions = {
+        mediaTypes: supportsNew ? 'images' : ImagePicker.MediaTypeOptions.Images,
+        base64: true,
+        quality: 0.8,
+        allowsEditing: false,
+      };
+  
+      const result = await ImagePicker.launchImageLibraryAsync(pickOptions);
+  
+      // SDK마다 필드 이름이 다름: canceled(54) / cancelled(53)
+      const canceled = supportsNew ? result?.canceled : result?.cancelled;
+      if (canceled) return;
+  
+      const asset = result?.assets?.[0];
+      if (!asset) return;
+  
+      const mime = asset.mimeType || 'image/jpeg';
+      if (!asset.base64) {
+        Alert.alert('알림', '이미지 Base64가 비어 있습니다.');
+        return;
+      }
+      setPhoto(`data:${mime};base64,${asset.base64}`);
+    } catch (e) {
+      console.error('[pick] error', e);
+      Alert.alert('에러', '이미지 선택 중 오류가 발생했습니다.');
     }
   };
-
+  
   const statusMapping = {
     "모집중": "FIRST",
     "입금 대기중": "SECOND",

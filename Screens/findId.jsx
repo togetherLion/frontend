@@ -18,7 +18,7 @@ const FindIdScreen = ({ navigation }) => {
     //console.log(name);
     try {
       const resp = await axios
-        .post('http://192.168.219.45:8080/user/findId', {
+        .post('http://172.30.1.81:8080/user/findId', {
           name : name,
           phone : phone,
         })
