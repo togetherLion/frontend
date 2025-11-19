@@ -13,15 +13,15 @@ const SearchScreen = ({ navigation, route }) => {
     //const [recentSearches, setRecentSearches] = useState(['헌터헌터보고싶다', '샌드위치', '롯데리아', '오이김치', '오이김치']);
     const [popularSearches, setPopularSearches] = useState([
         { rank: '1.', term: '두바이', },
-        { rank: '2.', term: '케이크' },
+        { rank: '2.', term: '구두' },
         { rank: '3.', term: '과자' },
-        { rank: '4.', term: '빙수' },
-        { rank: '5.', term: '빙수' },
-        { rank: '6.', term: '요아리', },
+        { rank: '4.', term: '쌀10kg' },
+        { rank: '5.', term: '훠궈소스' },
+        { rank: '6.', term: '요아정', },
         { rank: '7.', term: '컴포즈커피' },
         { rank: '8.', term: '샤넬' },
-        { rank: '9.', term: '빙수' },
-        { rank: '10.', term: '빙수' }
+        { rank: '9.', term: '몬치치인형' },
+        { rank: '10.', term: '폰케이스' }
     ]);
     const [sortOption, setSortOption] = useState('이웃추가순'); // Default sorting option
     const [modalVisible, setModalVisible] = useState(false);
@@ -48,7 +48,7 @@ const SearchScreen = ({ navigation, route }) => {
 
     const fetchRecentSearches = async () => {
         try {
-            const response = await axios.post('http://172.30.1.81:8080/posts/recentSearch');
+            const response = await axios.post('http://172.30.1.56:8080/posts/recentSearch');
             setRecentSearches(response.data); // 최근 검색어 5개만 설정
         } catch (error) {
             console.error(error);
@@ -72,16 +72,16 @@ const SearchScreen = ({ navigation, route }) => {
 
 
 
-        let url = `http://172.30.1.81:8080/posts/search/${searchText}`;
+        let url = `http://172.30.1.56:8080/posts/search/${searchText}`;
 
         if (sortOption === '저가순') {
-            url = `http://172.30.1.81:8080/posts/search/low/${searchText}`;
+            url = `http://172.30.1.56:8080/posts/search/low/${searchText}`;
         } else if (sortOption === '고가순') {
-            url = `http://172.30.1.81:8080/posts/search/high/${searchText}`;
+            url = `http://172.30.1.56:8080/posts/search/high/${searchText}`;
         } else if (sortOption === '최신순') {
-            url = `http://172.30.1.81:8080/posts/search/${searchText}`;
+            url = `http://172.30.1.56:8080/posts/search/${searchText}`;
         } else if (sortOption === '가격대설정') {
-            url = `http://172.30.1.81:8080 /posts/search/${searchText}/${lowPrice}/${highPrice}`;
+            url = `http://172.30.1.56:8080 /posts/search/${searchText}/${lowPrice}/${highPrice}`;
         }
 
         try {
@@ -100,7 +100,7 @@ const SearchScreen = ({ navigation, route }) => {
 
     const handleSearch2 = async (searchTerm) => {
         // 사용할 검색어로 searchTerm을 직접 사용
-        let url = `http://172.30.1.81:8080/posts/search/${searchTerm}`;
+        let url = `http://172.30.1.56:8080/posts/search/${searchTerm}`;
 
         try {
             const response = await axios.get(url);
@@ -149,10 +149,10 @@ const SearchScreen = ({ navigation, route }) => {
             return;
         }
 
-        let url = `http://172.30.1.81:8080/posts/search/${searchText}`;
+        let url = `http://172.30.1.56:8080/posts/search/${searchText}`;
 
         if (sortOption === '가격대설정') {
-            url = `http://172.30.1.81:8080/posts/search/${searchText}/${lowPrice}/${highPrice}`;
+            url = `http://172.30.1.56:8080/posts/search/${searchText}/${lowPrice}/${highPrice}`;
         }
 
         try {

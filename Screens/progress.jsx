@@ -28,7 +28,7 @@ const ProgressScreen = ({ navigation, route }) => {
     const fetchChatStatus = async () => {
       try {
         const response = await axios
-          .get('http://172.30.1.81:8080/posts/1' /*+ route.params.postId*/)
+          .get('http://172.30.1.56:8080/posts/1' /*+ route.params.postId*/)
           .then((response) => {
             setChatStatus(response.data.dealState)
             updateProgress(response.data.dealState)
@@ -146,7 +146,7 @@ const ProgressScreen = ({ navigation, route }) => {
   const sendChatStatusToServer = async (chatStatus) => {
     try {
       await axios.put(
-        'http://172.30.1.81:8080/posts/1' /*+ route.params.postId*/,
+        'http://172.30.1.56:8080/posts/1' /*+ route.params.postId*/,
         {
           dealState: chatStatus,
         }

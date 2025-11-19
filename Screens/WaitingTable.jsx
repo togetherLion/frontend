@@ -26,7 +26,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
     const fetchPendingUser = async () => {
         try {
             const response = await axios.get(
-                `http://172.30.1.81:8080/waitingdeal/userpending/${postId}` /* + postId*/
+                `http://172.30.1.56:8080/waitingdeal/userpending/${postId}` /* + postId*/
             )
             const data = response.data
             setPendingUserData(data)
@@ -38,7 +38,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
     const fetchAcceptedUser = async () => {
         try {
             const response = await axios.get(
-                `http://172.30.1.81:8080/waitingdeal/useraccepted/${postId}` /* + postId*/
+                `http://172.30.1.56:8080/waitingdeal/useraccepted/${postId}` /* + postId*/
             )
 
             const data = response.data
@@ -52,7 +52,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
         try {
             console.log(userId)
             console.log(postId)
-            await axios.put("http://172.30.1.81:8080/waitingdeal/accept", null, {
+            await axios.put("http://172.30.1.56:8080/waitingdeal/accept", null, {
                 params: {
                     userId: userId,
                     postId: postId
@@ -77,7 +77,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
 
         console.log(userId)
         console.log(postId)
-        await axios.put("http://172.30.1.81:8080/waitingdeal/reject", null, {
+        await axios.put("http://172.30.1.56:8080/waitingdeal/reject", null, {
             params: {
                 userId: userId,
                 postId: postId
