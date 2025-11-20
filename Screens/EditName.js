@@ -23,7 +23,7 @@ const EditName = ({ navigation, route }) => {
             setModalVisible(true);
         }
         else {
-            axios.post("http://172.30.1.56:8080/user/changeName", {
+            axios.post("http://165.229.169.110:8080/user/changeName", {
                 name: rename,
             }).then(function (resp) {   
                 console.log(resp.data);

@@ -14,7 +14,7 @@ const ChatListScreen = ({ navigation, route }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://172.30.1.56:8080/chat/my');
+                const response = await axios.get('http://165.229.169.110:8080/chat/my');
                 // 서버로부터 받아온 데이터를 상태에 저장
                 setChatData(response.data.map(item => ({
                     ...item,

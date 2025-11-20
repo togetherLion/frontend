@@ -42,9 +42,9 @@
 //   async function getMyPage() {
 //     try {
 //       const responses = await Promise.all([
-//         axios.post("http://172.30.1.56:8080/user/userProfile", { userId: userId }),
-//         axios.get("http://172.30.1.56:8080/posts/my"),
-//         axios.get("http://172.30.1.56:8080/goods/liked"),
+//         axios.post("http://165.229.169.110:8080/user/userProfile", { userId: userId }),
+//         axios.get("http://165.229.169.110:8080/posts/my"),
+//         axios.get("http://165.229.169.110:8080/goods/liked"),
 //       ]);
 
 //       const [resp1, resp2, resp3] = responses;
@@ -525,9 +525,9 @@ const MyPage = ({ navigation, route }) => {
     setLoading(true);
     try {
       const requests = [
-        axios.post('http://172.30.1.56:8080/user/userProfile', { userId }, { timeout: 8000 }),
-        axios.get('http://172.30.1.56:8080/posts/my', { timeout: 8000 }),
-        axios.get('http://172.30.1.56:8080/goods/liked', { timeout: 8000 }),
+        axios.post('http://165.229.169.110:8080/user/userProfile', { userId }, { timeout: 8000 }),
+        axios.get('http://165.229.169.110:8080/posts/my', { timeout: 8000 }),
+        axios.get('http://165.229.169.110:8080/goods/liked', { timeout: 8000 }),
       ];
 
       const [resp1, resp2, resp3] = await Promise.all(requests);

@@ -22,7 +22,7 @@
 
 // //     async function getPostList() {
 // //         try {
-// //             const resp = await axios.get("http://172.30.1.56:8080/posts/region")
+// //             const resp = await axios.get("http://165.229.169.110:8080/posts/region")
 
 // //             if (resp.data !== null && resp.data !== "") {
 // //                 //console.log(resp.data);
@@ -334,7 +334,7 @@
 //     const start = Date.now();
 //     setLoading(true);
 //     try {
-//       const resp = await axios.get('http://172.30.1.56:8080/posts/region', { timeout: 8000 });
+//       const resp = await axios.get('http://165.229.169.110:8080/posts/region', { timeout: 8000 });
 //       if (resp?.data) {
 //         setTownName(resp.data.townName);
 //         setPosts(resp.data.posts ?? []);
@@ -579,7 +579,7 @@ import {
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
-const SERVER_URL = 'http://172.30.1.56:8080'; // ✅ 한 곳에서 관리
+const SERVER_URL = 'http://165.229.169.110:8080'; // ✅ 한 곳에서 관리
 const REGION_URL = `${SERVER_URL}/posts/region`;
 
 const PostListScreen = ({ navigation, route }) => {
