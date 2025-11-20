@@ -79,11 +79,11 @@ const ChatListScreen = ({ navigation, route }) => {
             <View style={{ marginVertical: 20 }}></View>
 
             {/* 여기에 빈 공간을 추가합니다. */}
-            <View style={{ marginVertical: 20 }}></View>
+            <View style={{ marginVertical: 13 }}></View>
 
 
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Chat</Text>
+                <Text style={styles.headerTitle}>채팅</Text>
 
                 {/* <TouchableOpacity>
           <MaterialIcons name="add" size={24} color="black" />
@@ -135,14 +135,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
     },
     headerTitle: {
-        fontSize: 35,
+        fontSize: 32,
         fontWeight: 'bold',
-
+        marginLeft: 10,
+        marginBottom: 5
     },
     tabBar: {
         flexDirection: 'row',
@@ -156,18 +157,18 @@ const styles = StyleSheet.create({
     },
     tabItemActive: {
         paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderBottomWidth: 2,
-        borderBottomColor: '#ffcc80',
+        paddingVertical: 7,
+        borderBottomWidth: 3,
+        borderBottomColor: '#ffb445ff',
     },
     tabText: {
         fontSize: 16,
         color: 'gray',
     },
     tabTextActive: {
-        fontSize: 20,
-        color: '#ffcc80',
-        fontWeight: 'bold',
+        fontSize: 18,
+        color: '#ffb445ff',
+        //fontWeight: 'bold',
     },
     chatList: {
         flex: 1,
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     },
     chatName: {
         fontSize: 18,
-        fontWeight: 'bold',
+        //fontWeight: 'bold',
         marginBottom: 11,
     },
     chatTime: {
