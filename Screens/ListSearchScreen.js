@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#ddd',
     position: 'absolute',
-    bottom: 0,
+    bottom: 15,
     left: 0,
     right: 0,
   },

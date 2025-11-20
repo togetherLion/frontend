@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
   container: { flexGrow: 1, backgroundColor: '#fff' },
   scrollViewContentContainer: { flexGrow: 1 },
   fixedButtonsContainer: {
-    position: 'absolute', left: 0, right: 0, bottom: 50,
+    position: 'absolute', left: 0, right: 0, bottom: 60,
     backgroundColor: '#f5f5f5', paddingBottom: 0,
     borderTopWidth: 1, borderTopColor: '#eee',
   },
@@ -762,7 +762,7 @@ const styles = StyleSheet.create({
   bottomBar: {
     flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',
     backgroundColor: 'white', paddingVertical: 11, borderTopWidth: 1, borderTopColor: '#ddd',
-    position: 'absolute', bottom: 0, left: 0, right: 0,
+    position: 'absolute', bottom: 15, left: 0, right: 0,
   },
   bottomBarItem: { flex: 1, alignItems: 'center', color: '#ffcc80' },
   noContentMessage: { textAlign: 'center', paddingVertical: 20, color: '#888', fontSize: 14 },
