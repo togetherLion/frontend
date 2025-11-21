@@ -57,14 +57,14 @@
 //         await getRecommend()
 
 //         const response = await axios.get(
-//           `http://172.30.1.56:8080/waitingdeal/check-chat-room/${postId}`
+//           `http://165.229.169.110:8080/waitingdeal/check-chat-room/${postId}`
 //         )
 //         setRoomId(response.data.roomId)
 
 //         if (!connected) {
 //           websocketDispatch({
 //             type: 'CONNECT',
-//             payload: 'ws://172.30.1.56:8080/ws/chat',
+//             payload: 'ws://165.229.169.110:8080/ws/chat',
 //           })
 //         }
 //       } catch (error) {
@@ -123,7 +123,7 @@
 //   const getNickname = async () => {
 //     try {
 //       const response = await axios.post(
-//         'http://172.30.1.56:8080/user/userProfile',
+//         'http://165.229.169.110:8080/user/userProfile',
 //         { userId }
 //       )
 //       setNickname(response.data.nickname)
@@ -134,7 +134,7 @@
 
 //   const getAccount = async () => {
 //     try {
-//       const response = await axios.get('http://172.30.1.56:8080/chat/account')
+//       const response = await axios.get('http://165.229.169.110:8080/chat/account')
 //       setCheatMsg(response.data.cheatMsg)
 //       setAccount(response.data.account)
 //     } catch (error) {
@@ -144,7 +144,7 @@
 
 //   const getRecommend = async () => {
 //     try {
-//       const response = await axios.get('http://172.30.1.56:8080/chat/recommend', {
+//       const response = await axios.get('http://165.229.169.110:8080/chat/recommend', {
 //         params: { postId },
 //       })
 //       setRecommendations(response.data)
@@ -573,14 +573,14 @@
 //         await getRecommend()
 
 //         const response = await axios.get(
-//           `http://172.30.1.56:8080/waitingdeal/check-chat-room/${postId}`
+//           `http://165.229.169.110:8080/waitingdeal/check-chat-room/${postId}`
 //         )
 //         setRoomId(response.data.roomId)
 
 //         if (!connected) {
 //           websocketDispatch({
 //             type: 'CONNECT',
-//             payload: 'ws://172.30.1.56:8080/ws/chat',
+//             payload: 'ws://165.229.169.110:8080/ws/chat',
 //           })
 //         }
 //       } catch (error) {
@@ -639,7 +639,7 @@
 //   const getNickname = async () => {
 //     try {
 //       const response = await axios.post(
-//         'http://172.30.1.56:8080/user/userProfile',
+//         'http://165.229.169.110:8080/user/userProfile',
 //         { userId }
 //       )
 //       setNickname(response.data.nickname)
@@ -650,7 +650,7 @@
 
 //   const getAccount = async () => {
 //     try {
-//       const response = await axios.get('http://172.30.1.56:8080/chat/account')
+//       const response = await axios.get('http://165.229.169.110:8080/chat/account')
 //       setCheatMsg(response.data.cheatMsg)
 //       const acc = response.data?.account
 //       // null/undefined/빈 문자열 -> '계좌정보미기입'으로 대체
@@ -664,7 +664,7 @@
 
 //   const getRecommend = async () => {
 //     try {
-//       const response = await axios.get('http://172.30.1.56:8080/chat/recommend', {
+//       const response = await axios.get('http://165.229.169.110:8080/chat/recommend', {
 //         params: { postId },
 //       })
 //       setRecommendations(response.data)
@@ -1077,14 +1077,14 @@ const ChatRoomScreen = ({ navigation, route }) => {
         await getRecommend()
 
         const response = await axios.get(
-          `http://172.30.1.56:8080/waitingdeal/check-chat-room/${postId}`
+          `http://165.229.169.110:8080/waitingdeal/check-chat-room/${postId}`
         )
         setRoomId(response.data.roomId)
 
         if (!connected) {
           websocketDispatch({
             type: 'CONNECT',
-            payload: 'ws://172.30.1.56:8080/ws/chat',
+            payload: 'ws://165.229.169.110:8080/ws/chat',
           })
         }
       } catch (error) {
@@ -1155,7 +1155,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
   const getNickname = async () => {
     try {
       const response = await axios.post(
-        'http://172.30.1.56:8080/user/userProfile',
+        'http://165.229.169.110:8080/user/userProfile',
         { userId }
       )
       setNickname(response.data.nickname)
@@ -1166,7 +1166,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
 
   const getAccount = async () => {
     try {
-      const response = await axios.get('http://172.30.1.56:8080/chat/account')
+      const response = await axios.get('http://165.229.169.110:8080/chat/account')
       setCheatMsg(response.data.cheatMsg)
       const acc = response.data?.account
       setAccount(acc == null || acc === '' ? '계좌정보미기입' : acc)
@@ -1178,7 +1178,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
 
   const getRecommend = async () => {
     try {
-      const response = await axios.get('http://172.30.1.56:8080/chat/recommend', {
+      const response = await axios.get('http://165.229.169.110:8080/chat/recommend', {
         params: { postId },
       })
       setRecommendations(Array.isArray(response.data) ? response.data : [])
@@ -1491,7 +1491,7 @@ const ChatRoomScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffcc80',
+    backgroundColor: '#F4C089',
   },
   header: {
     flexDirection: 'row',
@@ -1510,7 +1510,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backButtonText: {
-    fontSize: 20,
+    fontSize: 16,
     color: '#F4C089',
   },
   headerTitle: {
