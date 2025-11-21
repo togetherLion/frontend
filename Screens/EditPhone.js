@@ -17,7 +17,7 @@ const EditPhone = ({ navigation, route }) => {
             setModalMessage('번호가 입력되지 않았습니다.');
             setModalVisible(true);
         } else {
-            axios.post("http://165.229.169.110:8080/user/phoneAuth", { phone: newphone })
+            axios.post("http://172.30.1.56:8080/user/phoneAuth", { phone: newphone })
                 .then(function (response) {
                     console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
                     if (response.data.auth !== undefined && response.data.auth !== null) {
@@ -42,7 +42,7 @@ const EditPhone = ({ navigation, route }) => {
             setModalMessage('인증번호가 일치하지 않습니다.');
             setModalVisible(true);
         } else {
-            axios.post("http://165.229.169.110:8080/user/changePhone", { phone: newphone })
+            axios.post("http://172.30.1.56:8080/user/changePhone", { phone: newphone })
             .then(function (response) {
                 console.log(response.data);  // 서버에서 받은 응답을 콘솔에 출력합니다.
                 setModalMessage('전화번호가 변경되었습니다.');

@@ -26,7 +26,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
     const fetchPendingUser = async () => {
         try {
             const response = await axios.get(
-                `http://165.229.169.110:8080/waitingdeal/userpending/${postId}` /* + postId*/
+                `http://172.30.1.56:8080/waitingdeal/userpending/${postId}` /* + postId*/
             )
             const data = response.data
             setPendingUserData(data)
@@ -38,7 +38,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
     const fetchAcceptedUser = async () => {
         try {
             const response = await axios.get(
-                `http://165.229.169.110:8080/waitingdeal/useraccepted/${postId}` /* + postId*/
+                `http://172.30.1.56:8080/waitingdeal/useraccepted/${postId}` /* + postId*/
             )
 
             const data = response.data
@@ -52,7 +52,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
         try {
             console.log(userId)
             console.log(postId)
-            await axios.put("http://165.229.169.110:8080/waitingdeal/accept", null, {
+            await axios.put("http://172.30.1.56:8080/waitingdeal/accept", null, {
                 params: {
                     userId: userId,
                     postId: postId
@@ -77,7 +77,7 @@ const WaitingTableScreen = ({ navigation, route }) => {
 
         console.log(userId)
         console.log(postId)
-        await axios.put("http://165.229.169.110:8080/waitingdeal/reject", null, {
+        await axios.put("http://172.30.1.56:8080/waitingdeal/reject", null, {
             params: {
                 userId: userId,
                 postId: postId
@@ -184,13 +184,13 @@ const WaitingTableScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffffffff', // 연한 배경색
+        backgroundColor: '#FFF4E1', // 연한 배경색
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 5,
+        padding: 15,
         backgroundColor: '#F4C089', // 테마 색상
     },
     backIcon: {
@@ -200,32 +200,29 @@ const styles = StyleSheet.create({
     backIconText: {
         color: '#fff',
         fontSize: 25,
-        marginTop: 0,
-        marginLeft: 10
+        marginTop: 15,
     },
     tabContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         paddingVertical: 10,
-        backgroundColor: '#ffeecfff', // 연한 배경색
+        backgroundColor: '#FFE5B4', // 연한 배경색
     },
     tabItem: {
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 20, // 둥근 모서리,
+        borderRadius: 20, // 둥근 모서리
     },
     activeTab: {
         backgroundColor: '#F4C089', // 테마 색상
     },
     tabText: {
-        color: '#faae5cff',
+        color: '#F4C089',
         fontWeight: 'bold',
-        fontSize : 15
     },
     activeTabText: {
-        color: '#ffffffff', // 밝은 색 텍스트
+        color: '#FFF4E1', // 밝은 색 텍스트
         fontWeight: 'bold',
-        fontSize : 15
     },
     scrollView: {
         flex: 1,
@@ -237,21 +234,18 @@ const styles = StyleSheet.create({
         padding: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
-        height: 65
     },
     waitingItem: {
         fontSize: 23,
         color: '#333',
         fontWeight: 'bold',
-        marginLeft : 15
     },
     acceptButton: {
         backgroundColor: '#F4C089',
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 8,
+        borderRadius: 5,
         marginRight: 10,
-
     },
     acceptButtonText: {
         color: '#fff',

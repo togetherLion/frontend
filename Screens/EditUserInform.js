@@ -13,7 +13,7 @@ const EditUserInform = ({ route, navigation }) => {
 
     async function handleChange() {
         try {
-            const resp = await axios.post("http://165.229.169.110:8080/user/changeInfo", {
+            const resp = await axios.post("http://172.30.1.56:8080/user/changeInfo", {
                 userAddress,
                 phone,
                 account,
@@ -32,7 +32,7 @@ const EditUserInform = ({ route, navigation }) => {
 
     async function sendVerificationCode() {
         try {
-            const resp = await axios.post("http://165.229.169.110:8080/user/sendVerificationCode", { phone });
+            const resp = await axios.post("http://172.30.1.56:8080/user/sendVerificationCode", { phone });
             if (resp.data) {
                 console.log("인증번호 전송 성공");
                 setVerificationCode(resp.data.verificationCode);

@@ -16,7 +16,7 @@ const FindPwScreen = ({ navigation }) => {
     try {
         console.log(loginId);
       const response = await axios
-        .post('http://165.229.169.110:8080/user/findPw', {
+        .post('http://172.30.1.56:8080/user/findPw', {
           loginId : loginId,
         })
         .then((response) => {

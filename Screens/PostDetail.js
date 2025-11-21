@@ -55,10 +55,10 @@ const PostDetail = ({ route }) => { // navigation 제거
 
     const handleHeartPress = () => {
         if (!isgood) {
-            axios.post("http://165.229.169.110:8080/goods/postlike", { postId: postId });
+            axios.post("http://172.30.1.56:8080/goods/postlike", { postId: postId });
         }
         else {
-            axios.delete("http://165.229.169.110:8080/goods", {
+            axios.delete("http://172.30.1.56:8080/goods", {
                 params: {
                     postId: postId
                 }
@@ -110,8 +110,8 @@ const PostDetail = ({ route }) => { // navigation 제거
     async function getPostDetail() {
         try {
             const responses = await Promise.all([
-                axios.get(`http://165.229.169.110:8080/posts/${postId}`),
-                axios.get(`http://165.229.169.110:8080/posts/user-posts/${postId}`),
+                axios.get(`http://172.30.1.56:8080/posts/${postId}`),
+                axios.get(`http://172.30.1.56:8080/posts/user-posts/${postId}`),
             ]);
 
             const [resp1, resp2] = responses;
@@ -172,7 +172,7 @@ const PostDetail = ({ route }) => { // navigation 제거
 
 
     const confirmParticipate = () => {
-        axios.post("http://165.229.169.110:8080/waitingdeal", { postId: postId })
+        axios.post("http://172.30.1.56:8080/waitingdeal", { postId: postId })
             .then((resp) => {
                 console.log(resp.data);
                 if (resp.data !== null && resp.data !== "") {
@@ -194,7 +194,7 @@ const PostDetail = ({ route }) => { // navigation 제거
     };
 
     const confirmDelete = () => {
-        axios.delete(`http://165.229.169.110:8080/posts/${postId}`)
+        axios.delete(`http://172.30.1.56:8080/posts/${postId}`)
             .then((resp) => {
                 setModalType('deleteconfirm');
                 setModalMessage('삭제 완료');
