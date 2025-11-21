@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    paddingTop: 30,
+    paddingTop: 10,
     marginLeft: 5,
   },
   imageWrapper: {

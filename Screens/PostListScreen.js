@@ -781,7 +781,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     padding: 7,
-    marginTop: 45,
+    marginTop: 25,
     marginLeft: 5,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
   bottomBar: {
     flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',
     backgroundColor: 'white', paddingVertical: 11, borderTopWidth: 1, borderTopColor: '#ddd',
-    position: 'absolute', bottom: 15, left: 0, right: 0,
+    position: 'absolute', bottom: 0, left: 0, right: 0,
   },
   bottomBarItem: { flex: 1, alignItems: 'center' },
   modalBackground: {
